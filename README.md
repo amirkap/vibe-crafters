@@ -1,2 +1,2 @@
-# playlist-builder
+# vibe-crafters
 PlaylistBuilder API service
