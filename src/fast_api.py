@@ -8,6 +8,8 @@ app = FastAPI()
 class Playlist(BaseModel):
     event: str
     music_genre: MusicGenre
+    # we need to have a certain format for range, so FastAPI can validate it
+    audience_age_range: str 
     year_range: str
 
 @app.post("/create_playlist")
