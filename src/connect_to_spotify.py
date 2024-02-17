@@ -170,7 +170,7 @@ class SpotifyAPIClass:
         return playlist_url
 
     def get_artist(self, artist_id):
-        url = "https://api.spotify.com/v1/artists/4Z8W4fKeB5YxbusRsdQVPb"
+        url = f"https://api.spotify.com/v1/artists/{artist_id}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
         }
@@ -211,6 +211,6 @@ connect = SpotifyAPIClass()
 # get_rec = connect.query_api("get_recommendations", {"seed_artists": "2U5N2KMBT6aFPrQMygMkhj"})
 # add_songs = connect.query_api("add_to_playlist", {"playlist_id": "2ozSrPTu9s8HDcst9emP9n", "songs_list": get_rec})
 # artists: "seed_artists": "06HL4z0CvFAxyc27GXpf02"
-full_request = connect.full_request_flow({"seed_genres": "dance", "seed_tracks": ["2WfaOiMkCvy7F5fcp2zZ8L", "0Q6mJSyGsUmg9WXgOcOf7A"], "limit": 100},
-                                         "80s Dance", "New playlist description")
-print(full_request)
+# full_request = connect.full_request_flow({"seed_genres": "dance", "seed_tracks": ["2WfaOiMkCvy7F5fcp2zZ8L", "0Q6mJSyGsUmg9WXgOcOf7A"], "limit": 100},
+#                                          "80s Dance", "New playlist description")
+# print(full_request)

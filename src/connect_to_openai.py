@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
-from fast_api import Playlist
+from Playlist import *
 
 
 class OpenAIClass:
@@ -52,20 +52,11 @@ def get_system_prompt():
     - Year Range: A string representing the range of years for the music (e.g., '2010-2020').
 
     Based on these user input parameters, determine the appropriate values for the following Spotify API parameters:
-    - limit (integer, range: 1-100)
-    - market (string, ISO 3166-1 alpha-2 country code) - default: US
-    - seed_artists (string, comma separated list of Spotify IDs for seed artists)
-    - seed_genres (string, comma separated list of genres) - required
-    - seed_tracks (string, comma separated list of Spotify IDs for seed tracks) 
     - min_acousticness, max_acousticness, target_acousticness (float, range: 0-1)
     - min_danceability, max_danceability, target_danceability (float, range: 0-1)
     - min_energy, max_energy, target_energy (float, range: 0-1)
     - min_instrumentalness, max_instrumentalness, target_instrumentalness (float, range: 0-1)
     - min_liveness, max_liveness, target_liveness (float, range: 0-1)
-    - min_loudness, max_loudness, target_loudness (float)
-    - min_popularity, max_popularity, target_popularity (integer, range: 0-100)
-    - min_tempo, max_tempo, target_tempo (float)
-    - min_valence, max_valence, target_valence (float, range: 0-1)
     ...
     The values for the Spotify API parameters should be derived based on the given user input parameters, taking into account the characteristics of the event, music genre, audience age range, and year range.
     Output the result as a JSON object and nothing else."""
@@ -74,7 +65,7 @@ def get_system_prompt():
 
 
 
-openai = OpenAIClass()
-user_input = Playlist(event="casual driving", music_genre="classic-rock", audience_age_range="5-75", year_range="1960-2002")
-response = openai.get_chat_response_from_openai(get_system_prompt(), user_input.__str__())
-print(response)
+# openai = OpenAIClass()
+# user_input = Playlist(event="casual driving", music_genre="rock", audience_age_range="5-75", year_range="1960-2002")
+# response = openai.get_chat_response_from_openai(get_system_prompt(), user_input.__str__())
+# print(response)
