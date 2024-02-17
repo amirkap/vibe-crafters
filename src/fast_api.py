@@ -12,6 +12,9 @@ class Playlist(BaseModel):
     audience_age_range: str 
     year_range: str
 
+    def __str__(self):
+        return self.model_dump_json()
+    
 @app.post("/create_playlist")
 async def create_playlist(playlist: Playlist):
     result = get_playlist(playlist)

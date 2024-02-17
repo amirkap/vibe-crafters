@@ -51,7 +51,6 @@ class MusicGenre(str, Enum):
     POP = "pop"
     K_POP = "k-pop"
     J_POP = "j-pop"
-    SYNTHPOP = "synthpop"  # Also under Electronic
     INDIE_POP = "indie-pop"
     POP_ROCK = "pop-rock"
 
