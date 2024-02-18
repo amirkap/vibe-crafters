@@ -30,5 +30,3 @@ def parse_to_dict(input_str):
         result_dict[key] = value
 
     return result_dict
-
-print(parse_to_dict('{"event": "casual driving", "music_genre": "rock", "audience_age_range": "5-75", "year_range": "1960-2002"}'))

@@ -6,12 +6,14 @@ from src.logic import *
 
 app = FastAPI()
 
+
 @app.post("/create_playlist")
 async def create_playlist(playlist: Playlist):
     result = get_playlist(playlist)
     return result
 
-@app.get("/get_recommended_artists")
-async def get_recommended_artists():
+
+@app.get("/recommended_artists")
+async def recommended_artists():
     result = get_recommended_artists()
     return result

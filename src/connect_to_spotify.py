@@ -92,7 +92,7 @@ class SpotifyAPIClass:
         try:
             method = getattr(self, func_name)
             response = method(**kwargs)
-            print(response)
+            print(f"Response of '{func_name}()': {response}")
             if "error" in response:
                 if response["error"]["status"] == 401 and iteration_no < 2:
                     if response["error"]["message"] in ["The access token expired", "Invalid access token"]:
@@ -139,17 +139,33 @@ class SpotifyAPIClass:
             "Authorization": f"Bearer {self.access_token}"}
 
         params = {k: v for k, v in kwargs.items() if v is not None}
-        seeds_values_count = sum([len(v) for k, v in params.items() if "seed" in k])
+        seeds_values_count = sum(len(v.split(',')) for k, v in params.items() if "seed" in k)
 
         if "seed_artists" or "seed_genres" or "seed_tracks" in params and seeds_values_count <= 5:
             response = requests.get(url, headers=headers, params=params)
             if response.status_code == 200:
-                tracks_list = [track["uri"] for track in response.json()["tracks"]]
-                return tracks_list
+                # tracks_list = [track["uri"] for track in response.json()["tracks"]]
+                # return tracks_list
+                tracks = response.json()["tracks"]
+                return tracks
             return response.json()
 
         return {"error": 400, "message": "At least one of seed_artists, seed_genres, or seed_tracks is required, at most five can be provided."}
 
+    def create_playlist_with_tracks(self, name, description, tracks_list):
+        create_playlist_response = self.query_api("create_playlist", {"name": name, "description": description})
+        if "error" in create_playlist_response:
+            return create_playlist_response
+        playlist_id = create_playlist_response["id"]
+        tracks_uri_list = [track["uri"] for track in tracks_list]
+        add_to_playlist_response = self.query_api("add_to_playlist", {"playlist_id": playlist_id, "songs_list": tracks_uri_list})
+        if "error" in add_to_playlist_response:
+            return add_to_playlist_response
+        playlist_url = create_playlist_response["external_urls"]["spotify"]
+        return playlist_url
+
+ # I broke down full_request_flow() function into a call to get_recommendations() and a call to create_playlist_with_tracks() (see in logic.py)
+ # I did it because of the tracks' filtering by year range.
     def full_request_flow(self, params, name, description=''):
         get_rec_response = self.query_api("get_recommendations", params)
         if "error" in get_rec_response:
@@ -168,6 +184,25 @@ class SpotifyAPIClass:
         if "error" in add_to_playlist_response:
             return add_to_playlist_response
         return playlist_url
+    def get_artist_id(self, artist_name):
+        search_url = "https://api.spotify.com/v1/search"
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        params = {
+            'q': artist_name,
+            'type': 'artist',
+            'limit': 1  # Assuming you want the top result
+        }
+        search_response = requests.get(search_url, headers=headers, params=params)
+        search_results = search_response.json()
+
+        # Step 3: Extract the Artist ID
+        if search_results['artists']['items']:
+            artist_id = search_results['artists']['items'][0]['id']
+            return artist_id
+        else:
+            return None
 
     def get_artist(self, artist_id):
         url = f"https://api.spotify.com/v1/artists/{artist_id}"
@@ -200,7 +235,7 @@ class SpotifyAPIClass:
 
         # Store the tokens and expiry time in your storage solution (e.g., session, database)
 
-connect = SpotifyAPIClass()
+# connect = SpotifyAPIClass()
 # res = connect.query_api("create_playlist", {"name": "JustTOTRY",
 #     "description": "New playlist description"})
 # print(res)
