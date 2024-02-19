@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, field_validator
 from src.music_genre import MusicGenre
+from src.mood import Mood
 import re
 from typing import Optional
 
@@ -9,22 +10,8 @@ from typing import Optional
 class Playlist(BaseModel):
     event: str
     music_genre: MusicGenre
-    audience_age_range: str
+    mood: Optional[Mood] = None
     year_range: Optional[str] = None
-
-    @field_validator('audience_age_range')
-    @classmethod
-    def validate_age_range(cls, v):
-        if not re.match(r'^\d+-\d+$', v):
-            raise ValueError('Audience age range must be in the format "min_age-max_age"')
-        min_age, max_age = map(int, v.split('-'))
-        if min_age < 0:
-            raise ValueError('Minimum age must be non-negative')
-        if max_age > 120:
-            raise ValueError('Maximum age must not be more than 120')
-        if min_age >= max_age:
-            raise ValueError('Minimum age must be less than maximum age')
-        return v
 
     @field_validator('year_range')
     @classmethod

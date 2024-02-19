@@ -28,11 +28,13 @@ def translate_track_names(params_dict, spotify):
     track_ids = [spotify.query_api("get_track_id", {"track_name": track_name}) for track_name in track_names]
     params_dict["seed_tracks"] = ",".join(track_ids)
 
+
+
 def convert_to_spotify_params_and_create_playlist():
     openai = OpenAIClass()
     spotify = SpotifyAPIClass()
-    user_input = Playlist(event="Road Trip in my car", music_genre="house", audience_age_range="20-25")
-    response = openai.get_chat_response_from_openai(get_system_prompt(), user_input.__str__())
+    user_input = Playlist(event="University graduation", music_genre="house", mood="happy", year_range="2010-2020")
+    response = openai.get_chat_response_from_openai(get_main_system_prompt(), user_input.__str__())
     print(f"OpenAI response: {response}")
     params_dict = parse_to_dict(response)
     if "seed_artists" in params_dict:
@@ -43,14 +45,20 @@ def convert_to_spotify_params_and_create_playlist():
     params_dict["limit"] = 100
     params_dict["market"] = "US"
 
-    recommended_tracks = find_min_num_of_tracks(40, params_dict, spotify, user_input["year_range"])
+    recommended_tracks = find_min_num_of_tracks(40, params_dict, spotify, user_input["year_range"], user_input)
 
-    playlist_url = spotify.create_playlist_with_tracks("SaharTrying", "yofi tofi", recommended_tracks)
+    playlist_url = spotify.create_playlist_with_tracks("KaplanTrying", "yofi tofi", recommended_tracks)
     print(f"Playlist URL: {playlist_url}")
     return playlist_url
 
+def get_new_seed_tracks_names(prev_seed_tracks, user_input: Playlist):
+    openai = OpenAIClass()
+    response = openai.get_chat_response_from_openai(get_extra_songs_system_prompt(prev_seed_tracks), user_input.__str__())
+    print(f"OpenAI new seed tracks response: {response}")
+    return response
 
-def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None):
+
+def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None, user_input=None, prev_seed_tracks_names=None):
     attempts = 0
     max_attempts = 3
     unique_tracks = []
@@ -82,16 +90,21 @@ def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None):
             # If not enough unique tracks, prepare for another attempt
             attempts += 1
             print(f"Attempt #{attempts}: Unique tracks so far: {len(unique_tracks)}. Trying to find more...")
-
-            if unique_tracks:
-                # Use up to 4 unique tracks from the results as seed_tracks for the next attempt
-                new_seed_tracks_list = [track["id"] for track in unique_tracks[-4:]]
-                if new_seed_tracks_list:
-                    new_seed_tracks = ','.join(new_seed_tracks_list)
-                    params_dict['seed_tracks'] = new_seed_tracks
-                    # Ensure seed_artists is not used in the next request
-                    if 'seed_artists' in params_dict:
-                        del params_dict['seed_artists']
+            params_dict['seed_tracks'] = get_new_seed_tracks_names(prev_seed_tracks_names, user_input)
+            prev_seed_tracks_names = params_dict['seed_tracks']
+            translate_track_names(params_dict, spotify)
+            # Ensure seed_artists is not used in the next request
+            if 'seed_artists' in params_dict:
+                del params_dict['seed_artists']
+            # if unique_tracks:
+            #     # Use up to 4 unique tracks from the results as seed_tracks for the next attempt
+            #     new_seed_tracks_list = [track["id"] for track in unique_tracks[-4:]]
+            #     if new_seed_tracks_list:
+            #         new_seed_tracks = ','.join(new_seed_tracks_list)
+            #         params_dict['seed_tracks'] = new_seed_tracks
+            #         # Ensure seed_artists is not used in the next request
+            #         if 'seed_artists' in params_dict:
+            #             del params_dict['seed_artists']
 
     return unique_tracks
 
@@ -107,4 +120,3 @@ def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None):
 convert_to_spotify_params_and_create_playlist()
 # spotify = SpotifyAPIClass()
 # print (spotify.query_api("get_artist_id", {"artist_name": "temptations"}))
-

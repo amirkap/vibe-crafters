@@ -137,5 +137,8 @@ class MusicGenre(str, Enum):
     def validate(cls, value, values : dict):
         if isinstance(value, cls):
             return value
-        value = value.lower().replace(' ', '-')
+        try:
+            value = value.lower().replace(' ', '-')
+        except AttributeError:
+            raise ValueError(f"Invalid value for MusicGenre: {value}")
         return cls(value)
