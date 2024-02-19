@@ -17,9 +17,8 @@ def parse_to_dict(input_str):
         spotify_params = [
             "min_acousticness", "max_acousticness",
             "min_danceability", "max_danceability",
-            "min_energy", "max_energy", "target_energy",
-            "min_instrumentalness", "max_instrumentalness",
-            "min_liveness", "max_liveness"
+            "min_energy", "max_energy", "max_instrumentalness",
+            "min_liveness", "seed_artists", "seed_tracks"
         ]
 
         if key not in spotify_params:

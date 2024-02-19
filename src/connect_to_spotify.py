@@ -92,7 +92,11 @@ class SpotifyAPIClass:
         try:
             method = getattr(self, func_name)
             response = method(**kwargs)
-            print(f"Response of '{func_name}()': {response}")
+            if func_name == "get_recommendations" and "error" not in response:
+                only_tracks = [track["uri"] for track in response]
+                print(f"Response of '{func_name}()': {only_tracks}")
+            else:
+                print(f"Response of '{func_name}()': {response}")
             if "error" in response:
                 if response["error"]["status"] == 401 and iteration_no < 2:
                     if response["error"]["message"] in ["The access token expired", "Invalid access token"]:
@@ -204,6 +208,25 @@ class SpotifyAPIClass:
         else:
             return None
 
+    def get_track_id(self, track_name):
+        search_url = "https://api.spotify.com/v1/search"
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        params = {
+            'q': track_name,
+            'type': 'track',
+            'limit': 1
+        }
+        search_response = requests.get(search_url, headers=headers, params=params)
+        search_results = search_response.json()
+
+        if search_results['tracks']['items']:
+            track_id = search_results['tracks']['items'][0]['id']
+            return track_id
+        else:
+            return None
+
     def get_artist(self, artist_id):
         url = f"https://api.spotify.com/v1/artists/{artist_id}"
         headers = {
@@ -235,7 +258,7 @@ class SpotifyAPIClass:
 
         # Store the tokens and expiry time in your storage solution (e.g., session, database)
 
-# connect = SpotifyAPIClass()
+connect = SpotifyAPIClass()
 # res = connect.query_api("create_playlist", {"name": "JustTOTRY",
 #     "description": "New playlist description"})
 # print(res)
@@ -243,9 +266,31 @@ class SpotifyAPIClass:
 #connect.get_artist("4Z8W4fKeB5YxbusRsdQVPb")
 #add_songs = connect.query_api("add_to_playlist", {"playlist_id": "2ozSrPTu9s8HDcst9emP9n",
                                                   #"songs_list": ["spotify:track:4iVYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M"]})2
-# get_rec = connect.query_api("get_recommendations", {"seed_artists": "2U5N2KMBT6aFPrQMygMkhj"})
+#get_rec = connect.query_api("get_recommendations", {"seed_artists": "2U5N2KMBT6aFPrQMygMkhj"})
 # add_songs = connect.query_api("add_to_playlist", {"playlist_id": "2ozSrPTu9s8HDcst9emP9n", "songs_list": get_rec})
 # artists: "seed_artists": "06HL4z0CvFAxyc27GXpf02"
 # full_request = connect.full_request_flow({"seed_genres": "dance", "seed_tracks": ["2WfaOiMkCvy7F5fcp2zZ8L", "0Q6mJSyGsUmg9WXgOcOf7A"], "limit": 100},
 #                                          "80s Dance", "New playlist description")
 # print(full_request)
+
+#get_track_id = connect.query_api("get_track_id", {"track_name": "The Less I Know The Better"})
+
+# for_rec = {
+#     "seed_artists": "06HL4z0CvFAxyc27GXpf02,0du5cEVh5yTK9QJze8zA0C",
+#     "seed_tracks": "0VjIjW4GlUZAMYd2vXMi3b,3PfIrDoz19wz7qK7tYeu62",
+#     "min_acousticness": 0.2,
+#     "max_acousticness": 0.6,
+#     "min_danceability": 0.6,
+#     "max_danceability": 0.8,
+#     "min_energy": 0.6,
+#     "max_energy": 0.8,
+#     # "min_instrumentalness": 0.1,
+#     "max_instrumentalness": 0.4,
+#     "min_liveness": 0.1,
+#     "max_liveness": 0.7,
+#     "seed_genres": "pop",
+#     "limit": 100,
+#     "market": "US"
+# }
+# get_rec = connect.query_api("get_recommendations", for_rec)
+# print(len(get_rec))

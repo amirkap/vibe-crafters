@@ -54,7 +54,7 @@ def get_system_prompt():
     Based on these user input parameters, determine the appropriate values for the following Spotify API parameters, provide only these parameters:
     Make sure 
     - seed_artists (comma-separated string of artists' names, not artist id) provide 2 exactly artists.
-    - seed_tracks (comma-separated string of track names, not track id) provide exactly 2 tracks.
+    - seed_tracks (comma-separated string of track names, not track id) provide exactly 2 tracks, which are not of the same artists as seed artists.
     MAKE SURE TO FIT THOSE ARTISTS TO THE REQUESTED MUSIC GENRE AND THE EVENT, AS WELL AS THE AUDIENCE AGE AND YEAR RANGE.
     Moreover, make sure to fit the next parameters I will tell you in the same way.
     - min_acousticness, max_acousticness, target_acousticness (float, range: 0-1)
