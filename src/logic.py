@@ -36,7 +36,7 @@ def convert_to_spotify_params_and_create_playlist():
     user_input = Playlist(event="University graduation", music_genre="house", mood="happy", year_range="2010-2020")
     response = openai.get_chat_response_from_openai(get_main_system_prompt(), user_input.__str__())
     print(f"OpenAI response: {response}")
-    params_dict = parse_to_dict(response)
+    params_dict = parse_params_to_dict(response)
     if "seed_artists" in params_dict:
         translate_artist_names(params_dict, spotify)
     if "seed_tracks" in params_dict:
