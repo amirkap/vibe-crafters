@@ -14,6 +14,16 @@ def parse_to_dict(input_str):
 
         # Remove any leading or trailing whitespace and quotes from the key
         key = key.strip().strip('"')
+        spotify_params = [
+            "min_acousticness", "max_acousticness",
+            "min_danceability", "max_danceability",
+            "min_energy", "max_energy", "target_energy",
+            "min_instrumentalness", "max_instrumentalness",
+            "min_liveness", "max_liveness"
+        ]
+
+        if key not in spotify_params:
+            continue
 
         # Try converting numerical values to float or int, and strip quotes from strings
         try:

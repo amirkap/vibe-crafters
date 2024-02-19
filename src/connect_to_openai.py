@@ -51,8 +51,10 @@ def get_system_prompt():
     - Audience Age Range: A string indicating the age range of the audience (e.g., '25-35').
     - Year Range: A string representing the range of years for the music (e.g., '2010-2020').
 
-    Based on these user input parameters, determine the appropriate values for the following Spotify API parameters:
-    - seed_artists (comma-separated string of artists' names) provide 2 exactly artists.
+    Based on these user input parameters, determine the appropriate values for the following Spotify API parameters, provide only these parameters:
+    Make sure 
+    - seed_artists (comma-separated string of artists' names, not artist id) provide 2 exactly artists.
+    - seed_tracks (comma-separated string of track names, not track id) provide exactly 2 tracks.
     MAKE SURE TO FIT THOSE ARTISTS TO THE REQUESTED MUSIC GENRE AND THE EVENT, AS WELL AS THE AUDIENCE AGE AND YEAR RANGE.
     Moreover, make sure to fit the next parameters I will tell you in the same way.
     - min_acousticness, max_acousticness, target_acousticness (float, range: 0-1)
@@ -62,6 +64,7 @@ def get_system_prompt():
     - min_liveness, max_liveness, target_liveness (float, range: 0-1)
     
     The values for the Spotify API parameters should be derived based on the given user input parameters, taking into account the characteristics of the event, music genre, audience age range, and year range.
+    Make sure not to choose extreme values for the parameters, and try to keep them within a reasonable range based on the user input.
     Output the result as a JSON object and nothing else."""
     return system_prompt
 
