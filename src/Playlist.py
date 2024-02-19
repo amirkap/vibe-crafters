@@ -2,13 +2,15 @@ from datetime import datetime
 from pydantic import BaseModel, field_validator
 from src.music_genre import MusicGenre
 import re
+from typing import Optional
+
 
 
 class Playlist(BaseModel):
     event: str
     music_genre: MusicGenre
     audience_age_range: str
-    year_range: str
+    year_range: Optional[str] = None
 
     @field_validator('audience_age_range')
     @classmethod

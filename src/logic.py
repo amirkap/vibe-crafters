@@ -31,8 +31,7 @@ def translate_track_names(params_dict, spotify):
 def convert_to_spotify_params_and_create_playlist():
     openai = OpenAIClass()
     spotify = SpotifyAPIClass()
-    user_input = Playlist(event="Grandma's 75th birthday", music_genre="pop", audience_age_range="5-55",
-                          year_range="2020-2023")
+    user_input = Playlist(event="Road Trip in my car", music_genre="house", audience_age_range="20-25")
     response = openai.get_chat_response_from_openai(get_system_prompt(), user_input.__str__())
     print(f"OpenAI response: {response}")
     params_dict = parse_to_dict(response)
@@ -46,9 +45,9 @@ def convert_to_spotify_params_and_create_playlist():
 
     recommended_tracks = find_min_num_of_tracks(40, params_dict, spotify, user_input["year_range"])
 
-    # playlist_url = spotify.create_playlist_with_tracks("SaharTrying", "yofi tofi", recommended_tracks)
-    # print(f"Playlist URL: {playlist_url}")
-    # return playlist_url
+    playlist_url = spotify.create_playlist_with_tracks("SaharTrying", "yofi tofi", recommended_tracks)
+    print(f"Playlist URL: {playlist_url}")
+    return playlist_url
 
 
 def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None):
