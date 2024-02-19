@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class MusicGenre(str, Enum):
     ACOUSTIC = "acoustic"
     AFROBEAT = "afrobeat"
@@ -127,3 +128,14 @@ class MusicGenre(str, Enum):
     TURKISH = "turkish"
     WORK_OUT = "work-out"
     WORLD_MUSIC = "world-music"
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, value, values : dict):
+        if isinstance(value, cls):
+            return value
+        value = value.lower().replace(' ', '-')
+        return cls(value)
