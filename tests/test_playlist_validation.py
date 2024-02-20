@@ -39,10 +39,17 @@ def test_playlist_invalid_music_genre(music_genre):
 
 # Test cases for invalid mood
 @pytest.mark.parametrize("mood", [
-    "angry",   # incorrect format
-    123,       # non-string
-    None,      # null value
+    "notpartofenum",      # incorrect format (assuming 'angry' is not in the Mood enum)
+    123,          # non-string
+    None,         # null value (Mood is optional, so this should not raise an error)
+    "happy123",   # mixed alphanumeric
+    "",           # empty string
+    " ",          # whitespace
 ])
 def test_playlist_invalid_mood(mood):
-    with pytest.raises(ValueError):
-        Playlist(event="Wedding", music_genre=MusicGenre.POP, mood=mood, year_range="2000-2020")
+    if mood is None:
+        playlist = Playlist(event="Wedding", music_genre=MusicGenre.POP, mood=mood, year_range="2000-2020")
+        assert playlist.mood is None
+    else:
+        with pytest.raises(ValueError):
+            Playlist(event="Wedding", music_genre=MusicGenre.POP, mood=mood, year_range="2000-2020")

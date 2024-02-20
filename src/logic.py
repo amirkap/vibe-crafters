@@ -33,7 +33,7 @@ def translate_track_names(params_dict, spotify):
 def convert_to_spotify_params_and_create_playlist():
     openai = OpenAIClass()
     spotify = SpotifyAPIClass()
-    user_input = Playlist(event="University graduation", music_genre="house", mood="happy", year_range="2010-2020")
+    user_input = Playlist(event="University graduation", music_genre="indie", mood="happy", year_range="2010-2020")
     response = openai.get_chat_response_from_openai(get_main_system_prompt(), user_input.__str__())
     print(f"OpenAI response: {response}")
     params_dict = parse_params_to_dict(response)
