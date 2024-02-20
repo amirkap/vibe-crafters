@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from music_genre import MusicGenre
+from src.music_genre import MusicGenre
 import src.Playlist
 from src.logic import *
 

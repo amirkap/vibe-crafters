@@ -2,12 +2,12 @@ import json
 
 from Utils import *
 from src.connect_to_openai import *
-from Playlist import *
+from src.Playlist import Playlist
 from src.connect_to_spotify import SpotifyAPIClass
 
 
-def get_playlist(playlist: Playlist):
-    pass
+def get_playlist(user_input: Playlist):
+    return convert_to_spotify_params_and_create_playlist(user_input)
 
 
 def get_recommended_artists():
@@ -30,10 +30,10 @@ def translate_track_names(params_dict, spotify):
 
 
 
-def convert_to_spotify_params_and_create_playlist():
+def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
     openai = OpenAIClass()
     spotify = SpotifyAPIClass()
-    user_input = Playlist(event="University graduation", music_genre="indie", mood="happy", year_range="2010-2020")
+    # user_input = Playlist(event="University graduation", music_genre="indie", mood="happy", year_range="2010-2020")
     response = openai.get_chat_response_from_openai(get_main_system_prompt(), user_input.__str__())
     print(f"OpenAI response: {response}")
     params_dict = parse_params_to_dict(response)
@@ -108,15 +108,6 @@ def find_min_num_of_tracks(min_num, params_dict, spotify, year_range=None, user_
 
     return unique_tracks
 
-    # full_request = spotify.full_request_flow(
-    #     params_dict,
-    #     "AmirCreatedThis 6", "This is a check")
-    # print(full_request)
 
+# convert_to_spotify_params_and_create_playlist()
 
-
-
-
-convert_to_spotify_params_and_create_playlist()
-# spotify = SpotifyAPIClass()
-# print (spotify.query_api("get_artist_id", {"artist_name": "temptations"}))
