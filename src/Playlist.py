@@ -30,3 +30,11 @@ class Playlist(BaseModel):
 
     def __getitem__(self, key):
         return getattr(self, key)
+
+    def __str__(self):
+        return_string = f"Event: {self.event}, Music Genre: {self.music_genre.value}"
+        if self.mood:
+            return_string += f", Mood: {self.mood.value}"
+        if self.year_range:
+            return_string += f", Year Range: {self.year_range}"
+        return return_string

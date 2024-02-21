@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from src.music_genre import MusicGenre
-import src.Playlist
-from src.logic import *
+from src.Playlist import Playlist
+from src.logic import get_playlist, get_recommended_artists
 
 app = FastAPI()
 
@@ -17,3 +17,6 @@ async def create_playlist(playlist: Playlist):
 async def recommended_artists():
     result = get_recommended_artists()
     return result
+
+
+#result = get_playlist(Playlist(event="Driving to the beach", music_genre="rock", mood="angry", year_range="2009-2021"))

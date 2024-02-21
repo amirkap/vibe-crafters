@@ -52,8 +52,10 @@ def get_extra_songs_system_prompt(songs_list):
     
     Your task is to provide exactly 4 additional songs along with their artists separated by commas, 
     that can be added to the playlist based on the given user input parameters, and based on the following songs: {songs_list}.
-    Make sure the the songs you provide are not one of those two songs. 
-    The output should be a string of exactly 4 song names separated by commas (2 songs would be in this format: "Let It Be - The Beatles,Shape of You - Ed Sheeran", but you need to provide 4).
+    Make sure the tracks you provide were released within the year range if it was provided, and that they fit the music genre and the event.
+    Make sure the the songs you provide are not one of those songs, provide only other songs. 
+    The output should be a string of exactly 4 song names separated by commas (2 songs would be in this format: "Let It Be - The Beatles,Shape of You - Ed Sheeran", but you need to provide 4). 
+    MAKE SURE NOT WRITE ANY ADDITIONAL INFORMATION SUCH AS WHY YOU CHOSE THESE SONGS, ONLY THE SONG NAMES AND THEIR ARTISTS SEPARATED BY COMMAS.
     """
     return system_prompt
 def get_main_system_prompt():
@@ -66,7 +68,8 @@ def get_main_system_prompt():
 
     Based on these user input parameters, determine the appropriate values for the following Spotify API parameters, provide only these parameters: 
     - seed_artists (comma-separated string of artists' names, not artist id) provide exactly 2 existing artists.
-    - seed_tracks (comma-separated string of track names and their artist, not track id. e.g: "Let It Be - The Beatles,Shape of You - Ed Sheeran")
+    - seed_tracks (comma-separated string of track names and their artist, not track id. e.g: "Let It Be - The Beatles,Shape of You - Ed Sheeran"). Make sure the tracks you provide 
+    were released within the year range if it was provided, and that they fit the music genre and the event.
     IMPORTANT NOTE - THE SEED TRACKS MUST NOT BE BY THE SAME ARTISTS YOU PROVIDE IN SEED ARTISTS, however they should still fit the user input parameters. make sure to provide exactly 2 tracks.
     MAKE SURE TO FIT THE SEED ARTISTS AND SEED TRACKS TO THE REQUESTED MUSIC GENRE AND THE EVENT, AND TO THE MOOD AND YEAR RANGE IF THEY ARE PROVIDED.
     Moreover, make sure to fit the next parameters I will tell you in the same way.
@@ -80,8 +83,6 @@ def get_main_system_prompt():
     Make sure not to choose extreme values for the parameters, and try to keep them within a reasonable range based on the user input.
     Output the result as a JSON object and nothing else."""
     return system_prompt
-
-
 
 
 # openai = OpenAIClass()
