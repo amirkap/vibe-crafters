@@ -92,9 +92,9 @@ pprint.pprint(spotify.get_track("6K4t31amVTZDgR3sKmwUJJ"))  # The less I know th
 pprint.pprint(spotify.get_artist("2lxX1ivRYp26soIavdG9bX"))  # Yardbirds
 # print(spotify.get_track_id("The less I know the better"))
 # print(spotify.get_artist_id("Yardbirds"))
-recommended_songs = spotify.get_recommendations(seed_artists=["2lxX1ivRYp26soIavdG9bX"],
+recommended_tracks = spotify.get_recommendations(seed_artists=["2lxX1ivRYp26soIavdG9bX"],
                                                  seed_tracks=["6K4t31amVTZDgR3sKmwUJJ"], seed_genres=["indie"],
                                                  limit=30, country="US")
-pprint.pprint(recommended_songs)
+pprint.pprint(recommended_tracks)
 new_playlist = spotify.create_playlist_with_tracks("Test playlist", "This is a test playlist", recommended_tracks)
 print(new_playlist)
