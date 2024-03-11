@@ -227,6 +227,15 @@ class SpotifyAPIClass:
         else:
             return None
 
+    def get_track_features(self, track_id):
+        url = f"https://api.spotify.com/v1/audio-features/{track_id}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        response = requests.get(url, headers=headers)
+        return response.json()
+
+
     def get_artist(self, artist_id):
         url = f"https://api.spotify.com/v1/artists/{artist_id}"
         headers = {

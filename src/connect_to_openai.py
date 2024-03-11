@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
-from src.Playlist import Playlist
+# from src.Playlist import Playlist
 
 
 class OpenAIClass:
@@ -100,31 +100,30 @@ def get_user_prompt(user_input):
     return user_prompt
 
 
+def get_assemsment_sys_promompt():
+    sys_prompt = """You will be provided with a list of Spotify track IDs. Your goal is to provide the audio features for each track.
+    The input will be a list of Spotify track IDs.
+    The output should be a list of dictionaries containing the audio features for each track, and nothing else.
+    """
+    return sys_prompt
+
+def get_assesment_user_prompt(tracks_df):
+    user_prompt = f"""I will provide you with a list of Spotify track IDs. Your goal is to provide the audio features for each track.
+    The input is:
+     {tracks_df}
+     
+    The output should be a list of dictionaries containing the audio features for each track.
+    USE SPOTIFY API TO GET THE AUDIO FEATURES FOR EACH TRACK.
+    DO NOT SAY ANYTHING IN YOUR RESPONSE, JUST PROVIDE THE AUDIO FEATURES FOR EVERY TRACK AS A DATAFRAME AND NOTHING ELSE.
+    DO NOT WRAP IT WITH ```python ``` OR ANYTHING ELSE.
+    MAKE SURE YOU PROVIDE ALL THE TRACKS IN THE SAME ORDER AS THEY WERE PROVIDED TO YOU.
+    """
+    return user_prompt
+
+
 openai = OpenAIClass()
-user_input = Playlist(event="Casual driving on the coastline", music_genre="indie", mood="happy", year_range="2010-2020")
-response = openai.get_chat_response_from_openai(get_main_system_prompt(), get_user_prompt(user_input))
-print(response)
+# user_input = Playlist(event="Casual driving on the coastline", music_genre="indie", mood="happy",
+#                       year_range="2010-2020")
+# response = openai.get_chat_response_from_openai(get_main_system_prompt(), get_user_prompt(user_input))
+# print(response)
 
-old_sys_prompt = """Given a set of user input parameters for a custom playlist creation API, translate these parameters into the corresponding input parameters required for the Spotify API's /recommendations endpoint.
-      The user input parameters are as follows:
-     - Event: A string describing the type of event (e.g., 'wedding', 'birthday party').
-     - Music Genre: A string representing the music genre (e.g., 'pop', 'rock').
-     - Mood: A string indicating the mood of the music (e.g., 'happy', 'energetic'). - Optional
-     - Year Range: A string representing the range of years for the music (e.g., '2010-2020'). - Optional
-
-     Based on these user input parameters, determine the appropriate values for the following Spotify API parameters, provide only these parameters: 
-     - seed_artists (comma-separated string of artists' names, not artist id) provide exactly 2 existing artists.
-     - seed_tracks (comma-separated string of track names and their artist, not track id. e.g: "Let It Be - The Beatles,Shape of You - Ed Sheeran"). Make sure the tracks you provide 
-     were released within the year range if it was provided, and that they fit the music genre and the event.
-     IMPORTANT NOTE - THE SEED TRACKS MUST NOT BE BY THE SAME ARTISTS YOU PROVIDE IN SEED ARTISTS, however they should still fit the user input parameters. make sure to provide exactly 2 tracks.
-     MAKE SURE TO FIT THE SEED ARTISTS AND SEED TRACKS TO THE REQUESTED MUSIC GENRE AND THE EVENT, AND TO THE MOOD AND YEAR RANGE IF THEY ARE PROVIDED.
-     Moreover, make sure to fit the next parameters I will tell you in the same way.
-     - min_acousticness, max_acousticness, target_acousticness (float, range: 0-1)
-     - min_danceability, max_danceability, target_danceability (float, range: 0-1)
-     - min_energy, max_energy, target_energy (float, range: 0-1)
-     - min_instrumentalness, max_instrumentalness, target_instrumentalness (float, range: 0-1)
-     - min_liveness, max_liveness, target_liveness (float, range: 0-1)
-
-     The values for the Spotify API parameters should be derived based on the given user input parameters, taking into account the characteristics of the event, music genre, audience age range, and year range.
-     Make sure not to choose extreme values for the parameters, and try to keep them within a reasonable range based on the user input.
-     Output the result as a JSON object and nothing else."""
