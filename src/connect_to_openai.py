@@ -101,20 +101,19 @@ def get_user_prompt(user_input):
 
 
 def get_assemsment_sys_promompt():
-    sys_prompt = """You will be provided with a list of Spotify track IDs. Your goal is to provide the audio features for each track.
-    The input will be a list of Spotify track IDs.
+    sys_prompt = """You will be provided with a list of track names and their artist. Your goal is to provide the Spotify audio features for each track.
+    The input will be a list of track names and their artists. 
     The output should be a list of dictionaries containing the audio features for each track, and nothing else.
     """
     return sys_prompt
 
-def get_assesment_user_prompt(tracks_df):
-    user_prompt = f"""I will provide you with a list of Spotify track IDs. Your goal is to provide the audio features for each track.
+def get_assesment_user_prompt(tracks_list):
+    user_prompt = f"""I will provide you with a list of track names and their artist. Your goal is to provide the Spotify audio features for each track.
     The input is:
-     {tracks_df}
+     {tracks_list}
      
     The output should be a list of dictionaries containing the audio features for each track.
-    USE SPOTIFY API TO GET THE AUDIO FEATURES FOR EACH TRACK.
-    DO NOT SAY ANYTHING IN YOUR RESPONSE, JUST PROVIDE THE AUDIO FEATURES FOR EVERY TRACK AS A DATAFRAME AND NOTHING ELSE.
+    DO NOT SAY ANYTHING IN YOUR RESPONSE, JUST PROVIDE THE AUDIO FEATURES FOR EVERY TRACK AND NOTHING ELSE.
     DO NOT WRAP IT WITH ```python ``` OR ANYTHING ELSE.
     MAKE SURE YOU PROVIDE ALL THE TRACKS IN THE SAME ORDER AS THEY WERE PROVIDED TO YOU.
     """

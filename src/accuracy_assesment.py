@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from connect_to_openai import OpenAIClass, get_assemsment_sys_promompt, get_assesment_user_prompt
 from connect_to_spotify import SpotifyAPIClass
+
 FILENAME = 'streamlit.csv'
 
 
@@ -28,22 +29,24 @@ def read_random_track_uris(df, num_rows):
 
 
 # Example usage
-
 streamlit_df = read_csv_file(FILENAME)  # Read the entire CSV file
+spotify = SpotifyAPIClass()
 
 # Sample 10,000 random track URIs
-num_rows = 20 # Number of random track IDs to extract
+num_rows = 20  # Number of random track IDs to extract
 sampled_df = read_random_track_uris(streamlit_df, num_rows)
 print(sampled_df)
-# uris_list = sampled_df['track_uri'].tolist()
-# print(uris_list)
+names_list = [spotify.get_track_and_artist_name(track_uri) for track_uri in sampled_df['track_uri']]
+names_list_with_ids = [track_uri + ':' + spotify.get_track_and_artist_name(track_uri) for track_uri in sampled_df['track_uri']]
+print(names_list)
+print(names_list_with_ids)
 
 # Set up OpenAI API
 openai = OpenAIClass()
 print("#################### OPENAI RESPONSE ####################")
-response = openai.get_chat_response_from_openai(get_assemsment_sys_promompt(), get_assesment_user_prompt(sampled_df))
+response = openai.get_chat_response_from_openai(get_assemsment_sys_promompt(), get_assesment_user_prompt(names_list))
 print(response)
 
-# spotify = SpotifyAPIClass()
+
 # print("#################### SPOTIFY API ####################")
 # print([spotify.get_track_features(track_uri) for track_uri in uris_list])
