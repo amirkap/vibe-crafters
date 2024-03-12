@@ -109,10 +109,11 @@ def get_assemsment_sys_promompt():
 
 def get_assesment_user_prompt(tracks_list):
     user_prompt = f"""I will provide you with a list of track names and their artist. Your goal is to provide the Spotify audio features for each track.
+    It might be helpful for you to figure out the track id for each track, and then use the Spotify API to get the audio features for each track.
     The input is:
      {tracks_list}
      
-    The output should be a list of dictionaries containing the audio features for each track.
+    The output should be a list of dictionaries containing the audio features and the track's name for each track. 
     DO NOT SAY ANYTHING IN YOUR RESPONSE, JUST PROVIDE THE AUDIO FEATURES FOR EVERY TRACK AND NOTHING ELSE.
     DO NOT WRAP IT WITH ```python ``` OR ANYTHING ELSE.
     MAKE SURE YOU PROVIDE ALL THE TRACKS IN THE SAME ORDER AS THEY WERE PROVIDED TO YOU.
