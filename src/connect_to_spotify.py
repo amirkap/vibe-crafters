@@ -237,7 +237,7 @@ class SpotifyAPIClass:
         track_info = response.json()
         artist_name = track_info["artists"][0]["name"]
         track_name = track_info["name"]
-        return f"{track_name} - {artist_name}"
+        return {"track_name": track_name, "artist_name": artist_name}
 
     def get_track_features(self, track_id):
         url = f"https://api.spotify.com/v1/audio-features/{track_id}"
