@@ -5,10 +5,14 @@ from connect_to_openai import OpenAIClass, get_assemsment_sys_promompt, get_asse
 from connect_to_spotify import SpotifyAPIClass
 
 FILENAME = 'streamlit.csv'
-NUM_EXPERIMENTS = 3
+NUM_EXPERIMENTS = 10
 audio_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                   'instrumentalness', 'liveness', 'valence', 'tempo']
 
+# Set display options
+pd.set_option('display.max_rows', 30)  # Set the maximum number of rows to display
+pd.set_option('display.max_columns', 20)  # Set the maximum number of columns to display
+pd.set_option('display.width', 100)  # Set the width of the display in characters
 
 def read_csv_file(filename):
     df = pd.read_csv(filename)
