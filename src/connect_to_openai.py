@@ -81,25 +81,38 @@ def get_user_prompt(user_input):
      - Mood: A string indicating the mood of the music (e.g., 'happy', 'energetic'). - Optional
      - Year Range: A string representing the range of years for the music (e.g., '2010-2020'). - Optional
      
-     The user input parameters are: f{user_input} 
+     The user input parameters are: {user_input} 
      Based on these user input parameters, determine the appropriate values for the following Spotify API parameters; Provide only these parameters: 
      - seed_artists (comma-separated string of ARTIST NAMES (NOT IDS!)) - PROVIDE EXACTLY 2 ARTIST NAMES.
-     - seed_tracks (comma-separated string of track names and their artist (NOT IDS!)). DO NOT PROVIDE TRACKS BY ARTISTS THAT YOU CHOOSE FOR SEED_ARTISTS!!!
+     - seed_tracks (comma-separated string of track names and their artist (NOT IDS!)). PROVIDE EXACTLY 2 SEED TRACK NAMES.
+     TRY TO PROVIDE ARTISTS AND TRACKS THAT FIT THE EVENT, MUSIC GENRE, MOOD and YEAR RANGE (if provided).
+      DO NOT PROVIDE TRACKS BY ARTISTS THAT YOU CHOOSE FOR SEED_ARTISTS!!!
      Moreover, make sure to fit the next parameters I will tell you in the same way.
      - target_valence (float, range: 0-1)
+     - min_valence (float, range: 0-1)
+     - max_valence (float, range: 0-1)
      - target_danceability (float, range: 0-1)
+     - min_danceability (float, range: 0-1)
+     - max_danceability (float, range: 0-1)
      - target_acousticness (float, range: 0-1)
+     - min_acousticness (float, range: 0-1)
+     - max_acousticness (float, range: 0-1)
      - target_energy (float, range: 0-1)
+     - min_energy (float, range: 0-1)
+     - max_energy (float, range: 0-1)
      - target_instrumentalness (float, range: 0-1)
+     - min_instrumentalness (float, range: 0-1)
+     - max_instrumentalness (float, range: 0-1)
      - target_liveness (float, range: 0-1)
-
+     - min_liveness (float, range: 0-1)
+     - max_liveness (float, range: 0-1)
      The values for the Spotify API parameters should be derived based on the given user input parameters, taking into account the characteristics of the event, music genre, and mood.
      Output the result as a JSON object and nothing else. DO NOT WRAP IT WITH ```json``` OR ANYTHING ELSE.
      """
 
     return user_prompt
 
-
+# audio values correction prompts
 def get_assemsment_sys_promompt():
     sys_prompt = """You will be provided with a list of track names and their artist. Your goal is to provide the Spotify audio features for each track.
     The input will be a list of track names and their artists. 
@@ -113,7 +126,8 @@ def get_assesment_user_prompt(tracks_list):
     The input is:
      {tracks_list}
      
-    The output should be a list of dictionaries containing the audio features and the track's name for each track. 
+    The output should be a list of dictionaries containing these and their values: {'track_name', 'artist_name', 'danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
+                  'instrumentalness', 'liveness', 'valence', 'tempo'}
     DO NOT SAY ANYTHING IN YOUR RESPONSE, JUST PROVIDE THE AUDIO FEATURES FOR EVERY TRACK AND NOTHING ELSE.
     DO NOT WRAP IT WITH ```python ``` OR ANYTHING ELSE.
     MAKE SURE YOU PROVIDE ALL THE TRACKS IN THE SAME ORDER AS THEY WERE PROVIDED TO YOU.

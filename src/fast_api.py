@@ -19,4 +19,5 @@ async def recommended_artists():
     return result
 
 
-#result = get_playlist(Playlist(event="Driving to the beach", music_genre="rock", mood="angry", year_range="2009-2021"))
+#result = get_playlist(Playlist(event="Driving to the beach_new", music_genre="rock", mood="angry"))
+result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))
