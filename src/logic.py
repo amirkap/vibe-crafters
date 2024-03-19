@@ -281,6 +281,20 @@ def get_most_popular_artists(playlist_id, spotify):
 
     return seed_artists
 
+def get_most_popular_tracks(playlist_id, spotify):
+    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    if not playlist_tracks:
+        return None
+
+    tracks_ids = list(set([track['track']['id'] for track in playlist_tracks['items']]))
+    if len(tracks_ids) < 6:
+        return None
+    ids_and_popularity = [(track_id, spotify.get_track(track_id)["popularity"]) for track_id in tracks_ids]
+    sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
+    seed_tracks = [x[0] for x in sorted_ids_and_popularity][:6]
+
+    return seed_tracks
+
 spotify = SpotifyAPIClass()
 # print(find_seed_artists_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
 # print(find_seed_tracks_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
