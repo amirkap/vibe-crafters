@@ -235,7 +235,7 @@ def find_seed_tracks_by_playlist_id(playlist_id, spotify):
         return None
 
     tracks = [track['track']['uri'] for track in playlist_tracks['items']]
-    if len(tracks) < 4:
+    if len(tracks) < 6:
         return None
 
     seed_tracks = random.sample(tracks, 6)
@@ -247,13 +247,30 @@ def find_seed_artists_by_playlist_id(playlist_id, spotify):
         return None
 
     artists = [track['track']['artists'][0]['name'] for track in playlist_tracks['items']]
-    if len(artists) < 4:
+    if len(artists) < 6:
         return None
 
     seed_artists = random.sample(artists, 6)
     return seed_artists
+def get_most_popular_artists(playlist_id, spotify):
+    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    if not playlist_tracks:
+        return None
 
+    artists_ids = list(set([track['track']['artists'][0]['id'] for track in playlist_tracks['items']]))
+    print(artists_ids)
+    if len(artists_ids) < 6:
+        return None
+    ids_and_popularity = [(artist_id, spotify.get_artist(artist_id)["popularity"]) for artist_id in artists_ids]
+    sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
+    print(sorted_ids_and_popularity)
+    seed_artists = [x[0] for x in sorted_ids_and_popularity][:6]
+    #seed_artists = sorted(artists_ids, key=lambda x: spotify.get_artist(x)["popularity"], reverse=True)
+
+    return seed_artists
 
 spotify = SpotifyAPIClass()
-print(find_seed_artists_by_playlist_id("37i9dQZF1DX76Wlfdnj7AP", spotify))
+# print(find_seed_artists_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
+# print(find_seed_tracks_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
+print(get_most_popular_artists("6TeyryiZ2UEf3CbLXyztFA", spotify))
 print("TESTTTTT")

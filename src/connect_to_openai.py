@@ -13,13 +13,6 @@ class OpenAIClass:
         client = OpenAI(api_key=api_key, organization=org_id)
         self.client = client
 
-    def get_embedding_from_text(self, text):
-        response = self.client.embeddings.create(
-            input=text,
-            model="text-embedding-ada-002",
-        )
-        return response.data[0].embedding
-
     def get_chat_response_from_openai(self, system_prompt, user_prompt):
         messages = [
             {"role": "system", "content": system_prompt},
@@ -31,18 +24,6 @@ class OpenAIClass:
             messages=messages
         )
         return response.choices[0].message.content
-
-    def get_image_from_dalle(self, prompt):
-        response = self.client.images.generate(
-            model="dall-e-3",
-            prompt=prompt,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
-
-        image_url = response.data[0].url
-        return image_url
 
 
 def get_extra_songs_system_prompt(songs_list):
