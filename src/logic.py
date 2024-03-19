@@ -40,7 +40,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
     all_params_given = False
     params_dict = {}
     knn_values_dict = {}
-
+    num_attempts = 3
     # ask openai for the parameters for spotify api
     response = openai.get_chat_response_from_openai(get_main_system_prompt(), get_user_prompt(user_input.__str__()))
     print(f"OpenAI response: {response}")
@@ -58,7 +58,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
     correct_audio_values_in_place(params_dict)
     correct_audio_values_in_place(knn_values_dict)
 
-    seed_tracks_and_artists = find_seed_tracks_and_artists_from_spotify(user_input)
+    seed_tracks_and_artists = find_seed_tracks_and_artists_from_spotify(user_input, num_attempts)
 
     if seed_tracks_and_artists and seed_tracks_and_artists["seed_tracks"] and seed_tracks_and_artists["seed_artists"]:
         params_dict["seed_artists"] = seed_tracks_and_artists["seed_artists"]
@@ -66,7 +66,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
         all_params_given = True
 
         recommended_tracks = find_min_num_of_tracks_with_spotify_seeds(40, params_dict, spotify,
-                                                                   user_input)
+                                                                   user_input, num_attempts)
 
     else:
         # if the seed tracks and artists are not found from spotify, then get them from gpt
@@ -89,7 +89,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
             seed_tracks_names = params_dict["seed_tracks"].split(",")
             translate_track_names(params_dict, spotify)
 
-        recommended_tracks = find_min_num_of_tracks_with_gpt_seeds(40, params_dict, spotify, seed_tracks_names, user_input)
+        recommended_tracks = find_min_num_of_tracks_with_gpt_seeds(40, params_dict, spotify, seed_tracks_names, user_input, num_attempts)
 
     if not user_input["year_range"]:
         print(f"KNN values: {knn_values_dict}")
@@ -113,9 +113,9 @@ def get_new_seed_tracks_names(prev_seed_tracks, user_input: Playlist):
     seed_tracks_list = response.split(",")
     return seed_tracks_list
 
-def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, user_input=None):
+def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, user_input=None, num_attempts=3):
     attempts = 0
-    max_attempts = 3
+    max_attempts = num_attempts
     unique_tracks = []
     year_range = None
     add_artists = True
@@ -166,9 +166,9 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
 
     return unique_tracks
 
-def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input=None):
+def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input=None, num_attempts=3):
     attempts = 0
-    max_attempts = 4
+    max_attempts = num_attempts
     unique_tracks = []
     seed_tracks_list = seed_tracks_names.split(",")
     year_range = None
@@ -213,7 +213,7 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
     unique_tracks = [track["id"] for track in unique_tracks]
     return unique_tracks
 
-def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
+def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts):
     spotify = SpotifyAPIClass()
     mood_provided = user_input["mood"] is not None
     playlist_search = f'{user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
@@ -234,20 +234,20 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
 
 
 
-def find_seed_tracks_by_playlist_id(playlist_id, spotify):
+def find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts):
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
 
     tracks = [track['track']['id'] for track in playlist_tracks['items']]
-    if len(tracks) < 6:
+    if len(tracks) < num_attempts * 2:
         return None
 
-    seed_tracks = random.sample(tracks, 6)
+    seed_tracks = random.sample(tracks, num_attempts * 2)
     seed_tracks_str = ",".join(seed_tracks)
     return seed_tracks_str
 
-def find_seed_artists_by_playlist_id(playlist_id, spotify):
+def find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts):
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
@@ -257,21 +257,21 @@ def find_seed_artists_by_playlist_id(playlist_id, spotify):
     # remove duplicates
     artists = list(set(artists))
 
-    if len(artists) < 6:
+    if len(artists) < num_attempts * 2:
         return None
 
-    seed_artists = random.sample(artists, 6)
+    seed_artists = random.sample(artists, num_attempts * 2)
     seed_artists_str = ",".join(seed_artists)
     return seed_artists_str
 
-def get_most_popular_artists(playlist_id, spotify):
+def get_most_popular_artists(playlist_id, spotify, num_attempts):
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
 
     artists_ids = list(set([track['track']['artists'][0]['id'] for track in playlist_tracks['items']]))
     print(artists_ids)
-    if len(artists_ids) < 6:
+    if len(artists_ids) < num_attempts * 2:
         return None
     ids_and_popularity = [(artist_id, spotify.get_artist(artist_id)["popularity"]) for artist_id in artists_ids]
     sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
@@ -281,13 +281,13 @@ def get_most_popular_artists(playlist_id, spotify):
 
     return seed_artists
 
-def get_most_popular_tracks(playlist_id, spotify):
+def get_most_popular_tracks(playlist_id, spotify, num_attempts):
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
 
     tracks_ids = list(set([track['track']['id'] for track in playlist_tracks['items']]))
-    if len(tracks_ids) < 6:
+    if len(tracks_ids) < num_attempts * 2:
         return None
     ids_and_popularity = [(track_id, spotify.get_track(track_id)["popularity"]) for track_id in tracks_ids]
     sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
