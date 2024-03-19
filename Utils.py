@@ -1,3 +1,4 @@
+import ast
 genres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues",
           "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical",
           "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco",
@@ -15,37 +16,10 @@ genres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime",
 
 category_to_id = {'New Releases': '0JQ5DAqbMKFz6FAsUtgAab', 'Pop': '0JQ5DAqbMKFEC4WFtoNRpw', 'Hip-Hop': '0JQ5DAqbMKFQ00XGBls6ym', 'Rock': '0JQ5DAqbMKFDXXwE9BDJAr', 'Latin': '0JQ5DAqbMKFxXaXKP7zcDp', 'Charts': '0JQ5DAudkNjCgYMM0TZXDw', 'Dance/Electronic': '0JQ5DAqbMKFHOzuVTgTizF', 'Mood': '0JQ5DAqbMKFzHmL4tf05da', 'Indie': '0JQ5DAqbMKFCWjUTdzaG0e', 'Workout': '0JQ5DAqbMKFAXlCG6QvYQ4', 'Discover': '0JQ5DAtOnAEpjOgUKwXyxj', 'Country': '0JQ5DAqbMKFKLfwjuJMoNC', 'R&B': '0JQ5DAqbMKFEZPnFQSFB1T', 'K-pop': '0JQ5DAqbMKFGvOw3O4nLAf', 'Chill': '0JQ5DAqbMKFFzDl7qN9Apr', 'Sleep': '0JQ5DAqbMKFCuoRTxhYWow', 'Party': '0JQ5DAqbMKFA6SOHvT3gck', 'At Home': '0JQ5DAqbMKFx0uLQR2okcc', 'Decades': '0JQ5DAqbMKFIVNxQgRNSg0', 'Love': '0JQ5DAqbMKFAUsdyVjCQuL', 'Metal': '0JQ5DAqbMKFDkd668ypn6O', 'Jazz': '0JQ5DAqbMKFAJ5xb0fwo9m', 'Trending': '0JQ5DAqbMKFQIL0AXnG5AK', 'Wellness': '0JQ5DAqbMKFLb2EqgLtpjC', 'Anime': '0JQ5DAqbMKFziKOShCi009', 'Gaming': '0JQ5DAqbMKFCfObibaOZbv', 'Folk & Acoustic': '0JQ5DAqbMKFy78wprEpAjl', 'Focus': '0JQ5DAqbMKFCbimwdOYlsl', 'Soul': '0JQ5DAqbMKFIpEuaCnimBj', 'Kids & Family': '0JQ5DAqbMKFFoimhOqWzLB', 'Classical': '0JQ5DAqbMKFPrEiAOxgac3', 'TV & Movies': '0JQ5DAqbMKFOzQeOmemkuw', 'Instrumental': '0JQ5DAqbMKFRieVZLLoo9m', 'Punk': '0JQ5DAqbMKFAjfauKLOZiv', 'Ambient': '0JQ5DAqbMKFLjmiZRss79w', 'Netflix': '0JQ5DAqbMKFEOEBCABAxo9', 'Blues': '0JQ5DAqbMKFQiK2EHwyjcU', 'Cooking & Dining': '0JQ5DAqbMKFRY5ok2pxXJ0', 'Alternative': '0JQ5DAqbMKFFtlLYUHv8bT', 'Travel': '0JQ5DAqbMKFAQy4HL4XU2D', 'Caribbean': '0JQ5DAqbMKFObNLOHydSW8', 'Afro': '0JQ5DAqbMKFNQ0fGp4byGU', 'GLOW': '0JQ5DAqbMKFGnsSfvg90Wo', 'Songwriters': '0JQ5DAqbMKFSCjnQr8QZ3O', 'Nature & Noise': '0JQ5DAqbMKFI3pNLtYMD9S', 'Funk & Disco': '0JQ5DAqbMKFFsW9N8maB6z', 'League of Legends': '0JQ5DAqbMKFLYQVFHcXMae', 'Spotify Singles': '0JQ5DAqbMKFDBgllo2cUIN', 'Summer': '0JQ5DAqbMKFLVaM30PMBm4', 'EQUAL': '0JQ5DAqbMKFPw634sFwguI', 'RADAR': '0JQ5DAqbMKFOOxftoKZxod', 'Fresh Finds': '0JQ5DAqbMKFImHYGo3eTSg', 'Tastemakers': '0JQ5DAqbMKFRKBHIxJ5hMm'}
 
-
-
 def parse_params_to_dict(input_str):
-    # Initial cleanup: remove curly braces and split by newline to get individual entries
-    entries = input_str.strip("{}").split(",\n")
+    params_dict = ast.literal_eval(input_str)
 
-    # Initialize an empty dictionary to store the parsed key-value pairs
-    result_dict = {}
-
-    for entry in entries:
-        # Split each entry by the first colon to separate key and value
-        key, value = entry.split(": ", 1)
-
-        # Remove any leading or trailing whitespace and quotes from the key
-        key = key.strip().strip('"')
-
-        # Try converting numerical values to float or int, and strip quotes from strings
-        try:
-            # Attempt to convert to a float first
-            value = float(value)
-            # If the value is actually an integer (no decimal part), convert it to int
-            if value.is_integer():
-                value = int(value)
-        except ValueError:
-            # If conversion fails, it's a string, so remove leading/trailing whitespace and quotes
-            value = value.strip().strip('"')
-
-        # Add the parsed key-value pair to the result dictionary
-        result_dict[key] = value
-
-    return result_dict
+    return params_dict
 
 
 def extract_nearest_neighbours_input(params_dict):
@@ -146,3 +120,5 @@ def correct_audio_values_in_place(predict_audio_features):
             adjusted_value = value + audio_values_diff[plain_key]
             adjusted_value = max(0, min(adjusted_value, 1))
             predict_audio_features[key] = float(adjusted_value)
+
+

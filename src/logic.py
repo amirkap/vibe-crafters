@@ -50,6 +50,10 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
     knn_values_dict = extract_nearest_neighbours_input(params_dict)
     validate_and_fix_dict(params_dict)
 
+    params_dict["seed_genres"] = user_input["music_genre"].value
+    params_dict["limit"] = 100
+    params_dict["market"] = "US"
+
     # correct audio values by differences values
     correct_audio_values_in_place(params_dict)
     correct_audio_values_in_place(knn_values_dict)
@@ -86,10 +90,6 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
             translate_track_names(params_dict, spotify)
 
         recommended_tracks = find_min_num_of_tracks_with_gpt_seeds(40, params_dict, spotify, seed_tracks_names, user_input)
-
-    params_dict["seed_genres"] = user_input["music_genre"].value
-    params_dict["limit"] = 100
-    params_dict["market"] = "US"
 
     if not user_input["year_range"]:
         print(f"KNN values: {knn_values_dict}")
@@ -215,7 +215,8 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
 
 def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
     spotify = SpotifyAPIClass()
-    playlist_search = f'{user_input["music_genre"].value} {user_input["mood"].value}'
+    mood_provided = user_input["mood"] is not None
+    playlist_search = f'80s {user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
     playlist_response = spotify.search_item('playlist', playlist_search)
 
     if not playlist_response:
@@ -225,6 +226,7 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
     if not playlist_id:
         return None
 
+    print(f"Playlist ID: {playlist_id}")
     seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify)
     seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify)
 
@@ -282,5 +284,4 @@ def get_most_popular_artists(playlist_id, spotify):
 spotify = SpotifyAPIClass()
 # print(find_seed_artists_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
 # print(find_seed_tracks_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
-print(get_most_popular_artists("6TeyryiZ2UEf3CbLXyztFA", spotify))
-print("TESTTTTT")
+#print(get_most_popular_artists("6TeyryiZ2UEf3CbLXyztFA", spotify))

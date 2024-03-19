@@ -24,7 +24,7 @@ class Playlist(BaseModel):
             raise ValueError('Start year must not be earlier than 1900')
         if end_year > current_year:
             raise ValueError('End year must not be later than the current year')
-        if start_year >= end_year:
+        if start_year > end_year:
             raise ValueError('Start year must be less than end year')
         return v
 

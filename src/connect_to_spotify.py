@@ -166,6 +166,9 @@ class SpotifyAPIClass:
         playlist_id = create_playlist_response["id"]
         tracks_uri_list = [track["uri"] for track in tracks_list]
 
+        if len(tracks_uri_list) > 89:
+            tracks_uri_list = tracks_uri_list[:88]
+
         if neighbor_tracks_list:
             tracks_uri_list.extend(["spotify:track:" + track for track in neighbor_tracks_list])
 
@@ -175,26 +178,6 @@ class SpotifyAPIClass:
         playlist_url = create_playlist_response["external_urls"]["spotify"]
         return playlist_url
 
- # I broke down full_request_flow() function into a call to get_recommendations() and a call to create_playlist_with_tracks() (see in logic.py)
- # I did it because of the tracks' filtering by year range.
-    def full_request_flow(self, params, name, description=''):
-        get_rec_response = self.query_api("get_recommendations", params)
-        if "error" in get_rec_response:
-            return get_rec_response
-
-        create_playlist_response = self.query_api("create_playlist", {"name": name,
-                                                      "description": description})
-        if "error" in create_playlist_response:
-            return create_playlist_response
-
-        playlist_url = create_playlist_response["external_urls"]["spotify"]
-        playlist_id = create_playlist_response["id"]
-
-        add_to_playlist_response = self.query_api("add_to_playlist", {"playlist_id": playlist_id,
-                                                      "songs_list": get_rec_response})
-        if "error" in add_to_playlist_response:
-            return add_to_playlist_response
-        return playlist_url
     def get_artist_id(self, artist_name):
         search_url = "https://api.spotify.com/v1/search"
         headers = {
@@ -307,7 +290,7 @@ class SpotifyAPIClass:
         response = requests.get(url, headers=headers, params=params)
         return response.json()
 
-    def search_item(self, item_type, query, limit=1):
+    def search_item(self, item_type, query, limit=10):
         url = "https://api.spotify.com/v1/search"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -315,7 +298,8 @@ class SpotifyAPIClass:
         params = {
             'q': query,
             'type': item_type,
-            'limit': limit
+            'limit': limit,
+            'market': 'US'
         }
 
         response = requests.get(url, headers=headers, params=params)
