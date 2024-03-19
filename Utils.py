@@ -76,23 +76,35 @@ def validate_and_fix_dict(params_dict, add_artists=True):
         if key not in spotify_params:
             del params_dict[key]
 
-    # validates that no more than a total of 4 seed tracks and artists are given
     if not add_artists:
         if "seed_artists" in params_dict:
             del params_dict["seed_artists"]
     elif "seed_artists" in params_dict:
-        seed_artists_list = params_dict["seed_artists"].split(",")
-        if len(seed_artists_list) > 2:
-            params_dict["seed_artists"] = ",".join(seed_artists_list[:2])
+        if isinstance(params_dict["seed_artists"], str):
+            params_dict["seed_artists"] = params_dict["seed_artists"].split(",")
 
     if "seed_tracks" in params_dict:
-        seed_tracks_list = params_dict["seed_tracks"].split(",")
+        if isinstance(params_dict["seed_tracks"], str):
+            params_dict["seed_tracks"] = params_dict["seed_tracks"].split(",")
+
+def limit_dict_seeds_number(params_dict, add_artists=True):
+    # validates that no more than a total of 4 seed tracks and artists are given
+    seed_artists = params_dict.get("seed_artists", [])
+    seed_tracks = params_dict.get("seed_tracks", [])
+    if not add_artists:
+        if "seed_artists" in params_dict:
+            del params_dict["seed_artists"]
+    elif "seed_artists" in params_dict:
+        if len(seed_artists) > 2:
+            params_dict["seed_artists"] = seed_artists[:2]
+
+    if "seed_tracks" in params_dict:
         if add_artists:
-            if len(seed_tracks_list) > 2:
-                params_dict["seed_tracks"] = ",".join(seed_tracks_list[:2])
+            if len(seed_tracks) > 2:
+                params_dict["seed_tracks"] = seed_tracks[:2]
         else:
-            if len(seed_tracks_list) > 5:
-                params_dict["seed_tracks"] = ",".join(seed_tracks_list[:5])
+            if len(seed_tracks) > 5:
+                params_dict["seed_tracks"] = seed_tracks[:5]
 
 
 

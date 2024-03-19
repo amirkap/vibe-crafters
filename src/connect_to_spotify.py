@@ -156,12 +156,19 @@ class SpotifyAPIClass:
 
         return {"error": 400, "message": "At least one of seed_artists, seed_genres, or seed_tracks is required, at most five can be provided."}
 
-    def create_playlist_with_tracks(self, name, description, tracks_list):
+    def create_playlist_with_tracks(self, name, description, tracks_list, neighbor_tracks_list=None):
+        if len(tracks_list) == 0 and (not neighbor_tracks_list or len(neighbor_tracks_list) == 0):
+            return {"error": 400, "message": "We were unable to find tracks matching, try again."}
+
         create_playlist_response = self.query_api("create_playlist", {"name": name, "description": description})
         if "error" in create_playlist_response:
             return create_playlist_response
         playlist_id = create_playlist_response["id"]
         tracks_uri_list = [track["uri"] for track in tracks_list]
+
+        if neighbor_tracks_list:
+            tracks_uri_list.extend(["spotify:track:" + track for track in neighbor_tracks_list])
+
         add_to_playlist_response = self.query_api("add_to_playlist", {"playlist_id": playlist_id, "songs_list": tracks_uri_list})
         if "error" in add_to_playlist_response:
             return add_to_playlist_response
@@ -247,6 +254,23 @@ class SpotifyAPIClass:
         response = requests.get(url, headers=headers)
         return response.json()
 
+    def get_track_info(self, track_id):
+        url = f"https://api.spotify.com/v1/tracks/{track_id}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        response = requests.get(url, headers=headers)
+        return response.json()
+
+    def get_multiple_tracks_info(self, track_ids):
+        track_ids_str = ",".join(track_ids)
+        url = f"https://api.spotify.com/v1/tracks?ids={track_ids_str}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        response = requests.get(url, headers=headers)
+        return response.json()
+
 
     def get_artist(self, artist_id):
         url = f"https://api.spotify.com/v1/artists/{artist_id}"
@@ -256,6 +280,56 @@ class SpotifyAPIClass:
 
         response = requests.get(url, headers=headers)
         return response.json()
+
+    def get_categories(self, offset):
+        url = "https://api.spotify.com/v1/browse/categories"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        params = {
+            'limit': 20,
+            'offset': offset,
+        }
+
+        response = requests.get(url, headers=headers, params=params)
+        return response.json()
+
+    def browse_category_playlists(self, category_id):
+        url = f"https://api.spotify.com/v1/browse/categories/{category_id}/playlists"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        params = {
+            'limit': 20,
+            'locale': 'sv_US'
+        }
+
+        response = requests.get(url, headers=headers, params=params)
+        return response.json()
+
+    def search_item(self, item_type, query, limit=1):
+        url = "https://api.spotify.com/v1/search"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        params = {
+            'q': query,
+            'type': item_type,
+            'limit': limit
+        }
+
+        response = requests.get(url, headers=headers, params=params)
+        return response.json()
+
+    def get_playlist_songs(self, playlist_id):
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+
+        response = requests.get(url, headers=headers)
+        return response.json()
+
 
     def callback(self):
 
