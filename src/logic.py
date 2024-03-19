@@ -216,7 +216,7 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
 def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
     spotify = SpotifyAPIClass()
     mood_provided = user_input["mood"] is not None
-    playlist_search = f'80s {user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
+    playlist_search = f'{user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
     playlist_response = spotify.search_item('playlist', playlist_search)
 
     if not playlist_response:
@@ -227,8 +227,8 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
         return None
 
     print(f"Playlist ID: {playlist_id}")
-    seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify)
-    seed_artists = "SAAR BLUESHTEIN"
+    seed_tracks = get_most_popular_tracks(playlist_id, spotify)
+    seed_artists = get_most_popular_artists(playlist_id, spotify)
 
     return {"seed_tracks": seed_tracks, "seed_artists": seed_artists}
 
