@@ -123,14 +123,20 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
     if not params_dict["seed_tracks"] or not params_dict["seed_artists"]:
         return None
 
-    full_seed_tracks = params_dict["seed_tracks"]
-    full_seed_artists = params_dict["seed_artists"]
+    full_seed_tracks = params_dict["seed_tracks"].split(",")
+    full_seed_artists = params_dict["seed_artists"].split(",")
+
+    print("full_seed_tracks:", full_seed_tracks)
+    print("full_seed_artists:", full_seed_artists)
 
     if user_input["year_range"]:
         year_range = user_input["year_range"]
 
     while attempts < max_attempts and len(unique_tracks) < min_num:
-        validate_and_fix_dict(params_dict, add_artists)
+        print("indexeds:", attempts*2, attempts*2+2)
+        params_dict["seed_tracks"] = ",".join(full_seed_tracks[attempts*2:(attempts*2)+2])
+        params_dict["seed_artists"] = ",".join(full_seed_artists[attempts*2:(attempts*2)+2])
+        limit_dict_seeds_number(params_dict, add_artists)
         print("params for spotify:", json.dumps(params_dict, indent=2))
         # Fetch recommendations based on the current parameters
         recommended_tracks = spotify.query_api("get_recommendations", params_dict)
@@ -157,11 +163,8 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
             # If not enough unique tracks, prepare for another attempt
             attempts += 1
             print(f"Attempt #{attempts}: Unique tracks so far: {len(unique_tracks)}. Trying to find more...")
-            add_artists = False
-            params_dict['seed_tracks'] = get_new_seed_tracks_names(seed_tracks_list, user_input)
-            seed_tracks_list.append(params_dict['seed_tracks'].split(","))
-            translate_track_names(params_dict, spotify)
 
+    #unique_tracks = [track["id"] for track in unique_tracks]
     return unique_tracks
 
 def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input=None):
@@ -208,6 +211,7 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
             seed_tracks_list.append(params_dict['seed_tracks'])
             translate_track_names(params_dict, spotify)
 
+    unique_tracks = [track["id"] for track in unique_tracks]
     return unique_tracks
 
 def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
@@ -234,26 +238,27 @@ def find_seed_tracks_by_playlist_id(playlist_id, spotify):
     if not playlist_tracks:
         return None
 
-    tracks = [track['track']['uri'] for track in playlist_tracks['items']]
+    tracks = [track['track']['id'] for track in playlist_tracks['items']]
     if len(tracks) < 4:
         return None
 
     seed_tracks = random.sample(tracks, 6)
-    return seed_tracks
+    seed_tracks_str = ",".join(seed_tracks)
+    return seed_tracks_str
 
 def find_seed_artists_by_playlist_id(playlist_id, spotify):
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
 
-    artists = [track['track']['artists'][0]['name'] for track in playlist_tracks['items']]
+    artists = [track['track']['artists'][0]['id'] for track in playlist_tracks['items']]
+
+    # remove duplicates
+    artists = list(set(artists))
+
     if len(artists) < 4:
         return None
 
     seed_artists = random.sample(artists, 6)
-    return seed_artists
-
-
-spotify = SpotifyAPIClass()
-print(find_seed_artists_by_playlist_id("37i9dQZF1DX76Wlfdnj7AP", spotify))
-print("TESTTTTT")
+    seed_artists_str = ",".join(seed_artists)
+    return seed_artists_str
