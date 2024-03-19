@@ -228,7 +228,7 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist):
 
     print(f"Playlist ID: {playlist_id}")
     seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify)
-    seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify)
+    seed_artists = "SAAR BLUESHTEIN"
 
     return {"seed_tracks": seed_tracks, "seed_artists": seed_artists}
 
