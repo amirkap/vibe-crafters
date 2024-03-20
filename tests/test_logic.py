@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from mock_responses import *
-from src.logic import (
+from src.logic.logic import (
     find_seed_tracks_by_playlist_id,
     find_seed_artists_by_playlist_id,
     filter_tracks_by_decade,

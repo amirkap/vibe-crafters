@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 audio_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                   'instrumentalness', 'liveness', 'valence', 'tempo']
 
-# Get the directory where streamlit_clustering.py is located
+# Get the directory where dataset_manipulation.py is located
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the path to the streamlit.csv file

@@ -1,9 +1,7 @@
-from datetime import datetime
-from pydantic import BaseModel, field_validator
-from src.music_genre import MusicGenre
-from src.mood import Mood
-from src.decade import Decade
-import re
+from pydantic import BaseModel
+from src.models.music_genre import MusicGenre
+from src.models.mood import Mood
+from src.models.decade import Decade
 from typing import Optional
 
 

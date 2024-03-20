@@ -1,10 +1,9 @@
 import json
-
-from Utils import *
-from src.connect_to_openai import *
-from src.Playlist import Playlist
-from src.connect_to_spotify import SpotifyAPIClass
-from src.streamlit_clustering import find_nearest_neighbors_by_genre
+from src.utils.Utils import *
+from src.services.connect_to_openai import *
+from src.models.Playlist import Playlist
+from src.services.connect_to_spotify import SpotifyAPIClass
+from src.songs_dataset.dataset_manipulation import find_nearest_neighbors_by_genre
 import random
 
 
@@ -18,26 +17,6 @@ def get_playlist(user_input: Playlist):
         A string containing the URL to the playlist on Spotify.
     """
     return convert_to_spotify_params_and_create_playlist(user_input)
-
-
-def get_decades_start_and_end_years():
-    """
-    Get the start and end years for each decade from the 1950s to the 2020s.
-    Returns:
-        A dictionary containing the start and end years for each decade.
-    """
-    decades_years = {
-        '1950s': {'start_year': 1950, 'end_year': 1959},
-        '1960s': {'start_year': 1960, 'end_year': 1969},
-        '1970s': {'start_year': 1970, 'end_year': 1979},
-        '1980s': {'start_year': 1980, 'end_year': 1989},
-        '1990s': {'start_year': 1990, 'end_year': 1999},
-        '2000s': {'start_year': 2000, 'end_year': 2009},
-        '2010s': {'start_year': 2010, 'end_year': 2019},
-        '2020s': {'start_year': 2020, 'end_year': 2029},
-    }
-
-    return decades_years
 
 
 def filter_tracks_by_decade(recommended_tracks, decade: str):

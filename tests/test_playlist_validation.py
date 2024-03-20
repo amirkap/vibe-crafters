@@ -1,7 +1,7 @@
 import pytest
-from src.Playlist import Playlist
-from src.music_genre import MusicGenre
-from src.mood import Mood
+from src.models.Playlist import Playlist
+from src.models.music_genre import MusicGenre
+from src.models.mood import Mood
 
 # Test cases for valid inputs
 @pytest.mark.parametrize("event, music_genre, mood, year_range", [

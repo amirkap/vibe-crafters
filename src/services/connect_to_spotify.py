@@ -7,6 +7,9 @@ import requests
 
 
 class SpotifyAPIClass:
+    """
+    A class to represent the Spotify API and its functionalities.
+    """
     def __init__(self):
         load_dotenv()
         self.client_id = os.getenv("SPOTIFY_CLIENT_ID")
@@ -16,7 +19,7 @@ class SpotifyAPIClass:
         self.refresh_token = os.getenv("SPOTIFY_REFRESH_TOKEN")
 
         # get access token
-        env_values = dotenv_values(".env")
+        env_values = dotenv_values("../.env")
         current_time = datetime.now()
 
         # Check if token expiry exists and has passed
@@ -33,6 +36,11 @@ class SpotifyAPIClass:
 
 
     def get_access_token(self):
+        """
+        Fetches a new access token from the Spotify API.
+        Returns:
+            A dictionary containing the access token and its expiry time.
+        """
         url = "https://accounts.spotify.com/api/token"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -48,8 +56,18 @@ class SpotifyAPIClass:
         return response.json()
 
     def update_env_with_new_token(self, access_token, expires_in, refresh_token=None):
+        """
+        Updates the .env file with the new access token and its expiry time.
+        Args:
+            access_token: The new access token.
+            expires_in: The time in seconds until the token expires.
+            refresh_token: The new refresh token.
+
+        Returns:
+
+        """
         expiry_time = datetime.now() + timedelta(seconds=expires_in)
-        env_path = '.env'
+        env_path = '../.env'
         set_key(env_path, "ACCESS_TOKEN", access_token)
         set_key(env_path, "TOKEN_EXPIRY", expiry_time.strftime("%Y-%m-%d %H:%M:%S"))
         if refresh_token:
@@ -64,6 +82,11 @@ class SpotifyAPIClass:
         print("Token updated.")
 
     def refresh_access_token(self):
+        """
+        Refreshes the access token using the refresh token.
+        Returns:
+            A dictionary containing the new access token and its expiry time.
+        """
         url = "https://accounts.spotify.com/api/token"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -81,6 +104,9 @@ class SpotifyAPIClass:
         return response.json()
 
     def refresh_token_and_update_env(self):
+        """
+        Refreshes the access token and updates the .env file with the new token and its expiry time.
+        """
         new_token_data = self.refresh_access_token()
         self.update_env_with_new_token(new_token_data["access_token"], new_token_data["expires_in"])
         os.environ["ACCESS_TOKEN"] = new_token_data["access_token"]
@@ -89,6 +115,16 @@ class SpotifyAPIClass:
         print("Token updated.")
 
     def query_api(self, func_name, kwargs, iteration_no=0):
+        """
+        Queries the Spotify API using the specified function name and keyword arguments.
+        Args:
+            func_name: The name of the function to call.
+            kwargs: The keyword arguments to pass to the function.
+            iteration_no: The number of times to retry in the case of an error.
+
+        Returns:
+            The response from the API.
+        """
         try:
             method = getattr(self, func_name)
             response = method(**kwargs)
@@ -110,6 +146,15 @@ class SpotifyAPIClass:
             return {"error": 500, "message": "Internal server error"}
 
     def create_playlist(self, name, description=''):
+        """
+        Creates a new playlist for the current user.
+        Args:
+            name: The name of the playlist.
+            description: The description of the playlist.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -124,6 +169,15 @@ class SpotifyAPIClass:
         return response.json()
 
     def add_to_playlist(self, playlist_id, songs_list):
+        """
+        Adds a list of songs to the specified playlist.
+        Args:
+            playlist_id: The ID of the playlist to add the songs to.
+            songs_list: A list of Spotify URIs for the songs to add.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -138,6 +192,14 @@ class SpotifyAPIClass:
         return response.json()
 
     def get_recommendations(self, **kwargs):
+        """
+        Gets a list of recommended tracks based on the specified parameters.
+        Args:
+            **kwargs: The parameters to pass to the API.
+
+        Returns:
+            A list of recommended tracks.
+        """
         url = "https://api.spotify.com/v1/recommendations"
         headers = {
             "Authorization": f"Bearer {self.access_token}"}
@@ -157,6 +219,17 @@ class SpotifyAPIClass:
         return {"error": 400, "message": "At least one of seed_artists, seed_genres, or seed_tracks is required, at most five can be provided."}
 
     def create_playlist_with_tracks(self, name, description, tracks_list, neighbor_tracks_list=None):
+        """
+        Creates a new playlist and adds the specified tracks to it.
+        Args:
+            name: The name of the playlist.
+            description: The description of the playlist.
+            tracks_list: A list of tracks to add to the playlist.
+            neighbor_tracks_list: A list of tracks to add to the playlist, found by knn.
+
+        Returns:
+            The URL of the created playlist.
+        """
         if len(tracks_list) == 0 and (not neighbor_tracks_list or len(neighbor_tracks_list) == 0):
             return {"error": 400, "message": "We were unable to find tracks matching, try again."}
 
@@ -179,6 +252,14 @@ class SpotifyAPIClass:
         return playlist_url
 
     def get_artist_id(self, artist_name):
+        """
+        Gets the ID of the specified artist.
+        Args:
+            artist_name: The name of the artist to get the ID for.
+
+        Returns:
+            The ID of the artist.
+        """
         search_url = "https://api.spotify.com/v1/search"
         headers = {
             'Authorization': f'Bearer {self.access_token}'
@@ -199,6 +280,14 @@ class SpotifyAPIClass:
             return None
 
     def get_track_id(self, track_name):
+        """
+        Gets the ID of the specified track.
+        Args:
+            track_name: The name of the track to get the ID for.
+
+        Returns:
+            The ID of the track.
+        """
         search_url = "https://api.spotify.com/v1/search"
         headers = {
             'Authorization': f'Bearer {self.access_token}'
@@ -218,6 +307,14 @@ class SpotifyAPIClass:
             return None
 
     def get_track_and_artist_name(self, track_id):
+        """
+        Gets the name of the track and its artist.
+        Args:
+            track_id: The ID of the track to get the name and artist for.
+
+        Returns:
+            A dictionary containing the track name and artist name.
+        """
         url = f"https://api.spotify.com/v1/tracks/{track_id}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -230,6 +327,14 @@ class SpotifyAPIClass:
         return {"track_name": track_name, "artist_name": artist_name}
 
     def get_track_features(self, track_id):
+        """
+        Gets the audio features for the specified track.
+        Args:
+            track_id: The ID of the track to get the audio features for.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/audio-features/{track_id}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -238,6 +343,14 @@ class SpotifyAPIClass:
         return response.json()
 
     def get_track(self, track_id):
+        """
+        Gets the information for the specified track.
+        Args:
+            track_id: The ID of the track to get the information for.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/tracks/{track_id}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -246,6 +359,14 @@ class SpotifyAPIClass:
         return response.json()
 
     def get_multiple_tracks_info(self, track_ids):
+        """
+        Gets the information for the specified tracks.
+        Args:
+            track_ids: A list of track IDs to get the information for.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         track_ids_str = ",".join(track_ids)
         url = f"https://api.spotify.com/v1/tracks?ids={track_ids_str}"
         headers = {
@@ -256,6 +377,14 @@ class SpotifyAPIClass:
 
 
     def get_artist(self, artist_id):
+        """
+        Gets the information for the specified artist.
+        Args:
+            artist_id: The ID of the artist to get the information for.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/artists/{artist_id}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -264,33 +393,17 @@ class SpotifyAPIClass:
         response = requests.get(url, headers=headers)
         return response.json()
 
-    def get_categories(self, offset):
-        url = "https://api.spotify.com/v1/browse/categories"
-        headers = {
-            "Authorization": f"Bearer {self.access_token}",
-        }
-        params = {
-            'limit': 20,
-            'offset': offset,
-        }
-
-        response = requests.get(url, headers=headers, params=params)
-        return response.json()
-
-    def browse_category_playlists(self, category_id):
-        url = f"https://api.spotify.com/v1/browse/categories/{category_id}/playlists"
-        headers = {
-            "Authorization": f"Bearer {self.access_token}",
-        }
-        params = {
-            'limit': 20,
-            'locale': 'sv_US'
-        }
-
-        response = requests.get(url, headers=headers, params=params)
-        return response.json()
-
     def search_item(self, item_type, query, limit=10):
+        """
+        Searches for items on Spotify based on the specified query and type.
+        Args:
+            item_type: The type of item to search for (e.g., 'track', 'artist', 'album').
+            query: The search query.
+            limit: The maximum number of items to return.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = "https://api.spotify.com/v1/search"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -306,6 +419,14 @@ class SpotifyAPIClass:
         return response.json()
 
     def get_playlist_songs(self, playlist_id):
+        """
+        Gets the songs in the specified playlist.
+        Args:
+            playlist_id: The ID of the playlist to get the songs from.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -313,63 +434,3 @@ class SpotifyAPIClass:
 
         response = requests.get(url, headers=headers)
         return response.json()
-
-
-    def callback(self):
-
-        redirect_uri = 'http://localhost:8888/callback'
-
-        auth_options = {
-            'grant_type': 'authorization_code',
-            'code': "AQAbaC_MSWKqk37cp0p2zUEctMwyX_yJX7zA-wxeArvGQxhgy86_6fUnRQ50wP-v1h_rxO5MGANhmT220mxiQ_Y-pbjEfxuGKtGI8FkCkKLAwPMmciyERZOrPyQrPuQutsospXem7QTQ5MLuV_OmB_MN0aPBxULAe2kMeKmWdVDwBii2ZHh3W_gKab-WCCc1aLz9tGHr6oxONQ",
-            'redirect_uri': redirect_uri
-        }
-
-        response = requests.post('https://accounts.spotify.com/api/token', data=auth_options,
-                                 headers={'Authorization': 'Basic ' + base64.urlsafe_b64encode(
-                                     f'{self.client_id}:{self.client_secret}'.encode()).decode()})
-
-        if response.status_code != 200:
-            return "Failed to fetch token", response.status_code
-
-        token_info = response.json()
-        print(token_info)
-
-        # Store the tokens and expiry time in your storage solution (e.g., session, database)
-
-connect = SpotifyAPIClass()
-# res = connect.query_api("create_playlist", {"name": "JustTOTRY",
-#     "description": "New playlist description"})
-# print(res)
-# connect.callback()
-#connect.get_artist("4Z8W4fKeB5YxbusRsdQVPb")
-#add_songs = connect.query_api("add_to_playlist", {"playlist_id": "2ozSrPTu9s8HDcst9emP9n",
-                                                  #"songs_list": ["spotify:track:4iVYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M"]})2
-#get_rec = connect.query_api("get_recommendations", {"seed_artists": "2U5N2KMBT6aFPrQMygMkhj"})
-# add_songs = connect.query_api("add_to_playlist", {"playlist_id": "2ozSrPTu9s8HDcst9emP9n", "songs_list": get_rec})
-# artists: "seed_artists": "06HL4z0CvFAxyc27GXpf02"
-# full_request = connect.full_request_flow({"seed_genres": "dance", "seed_tracks": ["2WfaOiMkCvy7F5fcp2zZ8L", "0Q6mJSyGsUmg9WXgOcOf7A"], "limit": 100},
-#                                          "80s Dance", "New playlist description")
-# print(full_request)
-
-#get_track_id = connect.query_api("get_track_id", {"track_name": "The Less I Know The Better"})
-
-# for_rec = {
-#     "seed_artists": "06HL4z0CvFAxyc27GXpf02,0du5cEVh5yTK9QJze8zA0C",
-#     "seed_tracks": "0VjIjW4GlUZAMYd2vXMi3b,3PfIrDoz19wz7qK7tYeu62",
-#     "min_acousticness": 0.2,
-#     "max_acousticness": 0.6,
-#     "min_danceability": 0.6,
-#     "max_danceability": 0.8,
-#     "min_energy": 0.6,
-#     "max_energy": 0.8,
-#     # "min_instrumentalness": 0.1,
-#     "max_instrumentalness": 0.4,
-#     "min_liveness": 0.1,
-#     "max_liveness": 0.7,
-#     "seed_genres": "pop",
-#     "limit": 100,
-#     "market": "US"
-# }
-# get_rec = connect.query_api("get_recommendations", for_rec)
-# print(len(get_rec))

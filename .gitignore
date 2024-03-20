@@ -162,4 +162,4 @@ cython_debug/
 
 # Mac OS
 .DS_Store
-/src/streamlit.csv
+/src/songs_dataset/streamlit.csv

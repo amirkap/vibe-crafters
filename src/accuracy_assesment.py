@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 import ast
-from connect_to_openai import OpenAIClass, get_assemsment_sys_promompt, get_assesment_user_prompt
-from connect_to_spotify import SpotifyAPIClass
+from src.services.connect_to_openai import OpenAIClass, get_assemsment_sys_promompt, get_assesment_user_prompt
+from src.services.connect_to_spotify import SpotifyAPIClass
 
-FILENAME = 'streamlit.csv'
+FILENAME = 'songs_dataset/streamlit.csv'
 NUM_EXPERIMENTS = 10
 audio_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                   'instrumentalness', 'liveness', 'valence', 'tempo']

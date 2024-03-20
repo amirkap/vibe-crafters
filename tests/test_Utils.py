@@ -1,5 +1,5 @@
 import pytest
-from Utils import parse_params_to_dict, extract_nearest_neighbours_input, validate_and_fix_dict, limit_dict_seeds_number, correct_audio_values_in_place
+from src.utils.Utils import parse_params_to_dict, extract_nearest_neighbours_input, validate_and_fix_dict, limit_dict_seeds_number, correct_audio_values_in_place
 
 def test_parse_params_to_dict():
     # Valid input string
