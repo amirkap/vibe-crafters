@@ -20,9 +20,6 @@ def get_playlist(user_input: Playlist):
     return convert_to_spotify_params_and_create_playlist(user_input)
 
 
-def get_recommended_artists():
-    pass
-
 def get_decades_start_and_end_years():
     """
     Get the start and end years for each decade from the 1950s to the 2020s.
@@ -129,7 +126,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
 
     else:
         # if the seed tracks and artists are not found from spotify, then get them from gpt
-        print("Didnt find seed artists\songs from spotify. checking with gpt...")
+        print("Didnt find seed artists/songs from spotify. checking with gpt...")
 
         while not all_params_given:
             response = openai.get_chat_response_from_openai(get_main_system_prompt(), get_user_prompt(user_input.__str__()))

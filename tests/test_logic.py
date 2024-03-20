@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
+from mock_responses import *
 from src.logic import (
     find_seed_tracks_by_playlist_id,
     find_seed_artists_by_playlist_id,
@@ -8,7 +9,6 @@ from src.logic import (
     translate_track_names,
     SpotifyAPIClass,
     Playlist,
-    get_playlist,
     convert_to_spotify_params_and_create_playlist,
     get_new_seed_tracks_names,
     find_min_num_of_tracks_with_spotify_seeds,
@@ -22,24 +22,27 @@ from src.logic import (
 class TestLogic(unittest.TestCase):
 
 
-
     @patch('src.logic.OpenAIClass.get_chat_response_from_openai')
     @patch('src.logic.SpotifyAPIClass.create_playlist_with_tracks')
-    def test_get_playlist(self, mock_create_playlist, mock_get_chat_response):
-        mock_create_playlist.return_value = 'playlist_url'
-        mock_get_chat_response.return_value = 'response'
-        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
-        result = get_playlist(user_input)
-        self.assertEqual(result, 'playlist_url')
-
     @patch('src.logic.find_seed_tracks_and_artists_from_spotify')
-    @patch('src.logic.SpotifyAPIClass.create_playlist_with_tracks')
-    def test_convert_to_spotify_params_and_create_playlist(self, mock_create_playlist, mock_find_seeds):
+    @patch('src.logic.find_min_num_of_tracks_with_spotify_seeds')
+    def test_convert_to_spotify_params_and_create_playlist(self, mock_find_min_tracks, mock_find_seeds, mock_create_playlist, mock_get_chat_response):
+        # Set up mock return values
+        mock_get_chat_response.return_value = mock_openai_response
+        mock_find_seeds.return_value = mock_find_spotify_seeds_response
+        mock_find_min_tracks.return_value = mock_find_min_tracks_response
         mock_create_playlist.return_value = 'playlist_url'
-        mock_find_seeds.return_value = {'seed_tracks': 'track1,track2', 'seed_artists': 'artist1,artist2'}
+
+        # Call the function with a mock Playlist object
         user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
         result = convert_to_spotify_params_and_create_playlist(user_input)
+
+        # Assertions
         self.assertEqual(result, 'playlist_url')
+        mock_get_chat_response.assert_called()
+        mock_find_seeds.assert_called()
+        mock_find_min_tracks.assert_called()
+        mock_create_playlist.assert_called()
 
     @patch('src.logic.OpenAIClass.get_chat_response_from_openai')
     def test_get_new_seed_tracks_names(self, mock_get_chat_response):
@@ -69,8 +72,8 @@ class TestLogic(unittest.TestCase):
     @patch('src.logic.SpotifyAPIClass.search_item')
     @patch('src.logic.SpotifyAPIClass.get_playlist_songs')
     def test_find_seed_tracks_and_artists_from_spotify(self, mock_get_playlist_songs, mock_search_item):
-        mock_search_item.return_value = {'playlists': {'items': [{'id': 'playlist_id'}]}}
-        mock_get_playlist_songs.return_value = {'items': [{'track': {'id': 'track1'}}, {'track': {'id': 'track2'}}]}
+        mock_search_item.return_value = mock_search_item_response
+        mock_get_playlist_songs.return_value = mock_get_playlist_songs_response
         user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
         result = find_seed_tracks_and_artists_from_spotify(user_input, 1)
         self.assertIsNotNone(result)
