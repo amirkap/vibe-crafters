@@ -113,7 +113,7 @@ def get_new_seed_tracks_names(prev_seed_tracks, user_input: Playlist):
     seed_tracks_list = response.split(",")
     return seed_tracks_list
 
-def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, user_input=None, num_attempts=3):
+def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, user_input, num_attempts=3):
     attempts = 0
     max_attempts = num_attempts
     unique_tracks = []
@@ -122,6 +122,7 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
 
     if not params_dict["seed_tracks"] or not params_dict["seed_artists"]:
         return None
+
 
     full_seed_tracks = params_dict["seed_tracks"].split(",")
     full_seed_artists = params_dict["seed_artists"].split(",")
@@ -166,7 +167,7 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
 
     return unique_tracks
 
-def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input=None, num_attempts=3):
+def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input, num_attempts=3):
     attempts = 0
     max_attempts = num_attempts
     unique_tracks = []
@@ -227,8 +228,8 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts
         return None
 
     print(f"Playlist ID: {playlist_id}")
-    seed_tracks = get_most_popular_tracks(playlist_id, spotify)
-    seed_artists = get_most_popular_artists(playlist_id, spotify)
+    seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts)
+    seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
 
     return {"seed_tracks": seed_tracks, "seed_artists": seed_artists}
 

@@ -1,11 +1,17 @@
 import pandas as pd
+import os
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 
 audio_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                   'instrumentalness', 'liveness', 'valence', 'tempo']
-DATASET_NAME = 'streamlit.csv'
+
+# Get the directory where streamlit_clustering.py is located
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the streamlit.csv file
+DATASET_NAME = os.path.join(current_dir, "streamlit.csv")
 
 def init_data_frame():
     # Read the CSV file

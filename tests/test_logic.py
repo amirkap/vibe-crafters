@@ -1,0 +1,175 @@
+import unittest
+from unittest.mock import patch, MagicMock
+from src.logic import (
+    find_seed_tracks_by_playlist_id,
+    find_seed_artists_by_playlist_id,
+    filter_tracks_by_year_range,
+    translate_artist_names,
+    translate_track_names,
+    SpotifyAPIClass,
+    Playlist,
+    get_playlist,
+    convert_to_spotify_params_and_create_playlist,
+    get_new_seed_tracks_names,
+    find_min_num_of_tracks_with_spotify_seeds,
+    find_min_num_of_tracks_with_gpt_seeds,
+    find_seed_tracks_and_artists_from_spotify,
+    get_most_popular_artists,
+    get_most_popular_tracks
+)
+
+
+class TestLogic(unittest.TestCase):
+
+
+
+    @patch('src.logic.OpenAIClass.get_chat_response_from_openai')
+    @patch('src.logic.SpotifyAPIClass.create_playlist_with_tracks')
+    def test_get_playlist(self, mock_create_playlist, mock_get_chat_response):
+        mock_create_playlist.return_value = 'playlist_url'
+        mock_get_chat_response.return_value = 'response'
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        result = get_playlist(user_input)
+        self.assertEqual(result, 'playlist_url')
+
+    @patch('src.logic.find_seed_tracks_and_artists_from_spotify')
+    @patch('src.logic.SpotifyAPIClass.create_playlist_with_tracks')
+    def test_convert_to_spotify_params_and_create_playlist(self, mock_create_playlist, mock_find_seeds):
+        mock_create_playlist.return_value = 'playlist_url'
+        mock_find_seeds.return_value = {'seed_tracks': 'track1,track2', 'seed_artists': 'artist1,artist2'}
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        result = convert_to_spotify_params_and_create_playlist(user_input)
+        self.assertEqual(result, 'playlist_url')
+
+    @patch('src.logic.OpenAIClass.get_chat_response_from_openai')
+    def test_get_new_seed_tracks_names(self, mock_get_chat_response):
+        mock_get_chat_response.return_value = 'track1,track2'
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        result = get_new_seed_tracks_names(['track3', 'track4'], user_input)
+        self.assertEqual(result, ['track1', 'track2'])
+
+    @patch('src.logic.SpotifyAPIClass.query_api')
+    def test_find_min_num_of_tracks_with_spotify_seeds(self, mock_query_api):
+        mock_query_api.return_value = [{'id': 'track1'}, {'id': 'track2'}]
+        params_dict = {'seed_tracks': 'track3,track4', 'seed_artists': 'artist1,artist2'}
+        spotify = SpotifyAPIClass()
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        result = find_min_num_of_tracks_with_spotify_seeds(2, params_dict, spotify, user_input)
+        self.assertEqual(result, [{'id': 'track1'}, {'id': 'track2'}])
+
+    @patch('src.logic.SpotifyAPIClass.query_api')
+    def test_find_min_num_of_tracks_with_gpt_seeds(self, mock_query_api):
+        mock_query_api.return_value = [{'id': 'track1'}, {'id': 'track2'}]
+        params_dict = {'seed_tracks': 'track3,track4', 'seed_artists': 'artist1,artist2'}
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        spotify = SpotifyAPIClass()
+        result = find_min_num_of_tracks_with_gpt_seeds(2, params_dict, spotify, 'track5,track6', user_input)
+        self.assertEqual(result, ['track1', 'track2'])
+
+    @patch('src.logic.SpotifyAPIClass.search_item')
+    @patch('src.logic.SpotifyAPIClass.get_playlist_songs')
+    def test_find_seed_tracks_and_artists_from_spotify(self, mock_get_playlist_songs, mock_search_item):
+        mock_search_item.return_value = {'playlists': {'items': [{'id': 'playlist_id'}]}}
+        mock_get_playlist_songs.return_value = {'items': [{'track': {'id': 'track1'}}, {'track': {'id': 'track2'}}]}
+        user_input = Playlist(event='Driving to the beach', music_genre='rock', mood='happy')
+        result = find_seed_tracks_and_artists_from_spotify(user_input, 1)
+        self.assertIsNotNone(result)
+        self.assertIn('seed_tracks', result)
+        self.assertIn('seed_artists', result)
+
+    def test_get_most_popular_artists(self, mock_get_artist, mock_get_playlist_songs):
+        mock_get_playlist_songs.return_value = {
+            'items': [{'track': {'artists': [{'id': 'artist1'}, {'id': 'artist2'}]}}]}
+        mock_get_artist.side_effect = [{'popularity': 80}, {'popularity': 90}]
+        spotify = SpotifyAPIClass()
+        result = get_most_popular_artists('playlist_id', spotify, 1)
+        self.assertEqual(result, ['artist2'])
+
+    @patch('src.logic.SpotifyAPIClass.get_playlist_songs')
+    @patch('src.logic.SpotifyAPIClass.get_track')
+    def test_get_most_popular_tracks(self, mock_get_track, mock_get_playlist_songs):
+        mock_get_playlist_songs.return_value = {'items': [{'track': {'id': 'track1'}}, {'track': {'id': 'track2'}}]}
+        mock_get_track.side_effect = [{'popularity': 80}, {'popularity': 90}]
+        spotify = SpotifyAPIClass()
+        result = get_most_popular_tracks('playlist_id', spotify, 1)
+        self.assertEqual(result, ['track2'])
+
+    @patch('src.logic.SpotifyAPIClass.get_playlist_songs')
+    def test_find_seed_tracks_by_playlist_id(self, mock_get_playlist_songs):
+        mock_response = {
+            'items': [
+                {'track': {'id': 'track1'}},
+                {'track': {'id': 'track2'}},
+                {'track': {'id': 'track3'}},
+                {'track': {'id': 'track4'}},
+                {'track': {'id': 'track5'}},
+                {'track': {'id': 'track6'}}
+            ]
+        }
+        mock_get_playlist_songs.return_value = mock_response
+
+        spotify = SpotifyAPIClass()
+        result = find_seed_tracks_by_playlist_id('playlist_id', spotify, 2)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result.split(',')), 4)
+
+    @patch('src.logic.SpotifyAPIClass.get_playlist_songs')
+    def test_find_seed_artists_by_playlist_id(self, mock_get_playlist_songs):
+        mock_response = {
+            'items': [
+                {'track': {'artists': [{'id': 'artist1'}]}},
+                {'track': {'artists': [{'id': 'artist2'}]}},
+                {'track': {'artists': [{'id': 'artist3'}]}},
+                {'track': {'artists': [{'id': 'artist4'}]}},
+                {'track': {'artists': [{'id': 'artist5'}]}},
+                {'track': {'artists': [{'id': 'artist6'}]}}
+            ]
+        }
+        mock_get_playlist_songs.return_value = mock_response
+
+        spotify = SpotifyAPIClass()
+        result = find_seed_artists_by_playlist_id('playlist_id', spotify, 2)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result.split(',')), 4)
+
+    def test_filter_tracks_by_year_range(self):
+        mock_tracks = [
+            {'album': {'release_date': '2020-01-01'}},
+            {'album': {'release_date': '2021-01-01'}},
+            {'album': {'release_date': '2022-01-01'}},
+            {'album': {'release_date': '2023-01-01'}}
+        ]
+
+        result = filter_tracks_by_year_range(mock_tracks, '2021-2022')
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['album']['release_date'][:4], '2021')
+        self.assertEqual(result[1]['album']['release_date'][:4], '2022')
+
+    @patch('src.logic.SpotifyAPIClass.query_api')
+    def test_translate_artist_names(self, mock_query_api):
+        params_dict = {"seed_artists": "Artist1,Artist2"}
+        spotify = SpotifyAPIClass()
+
+        mock_query_api.side_effect = ['id1', 'id2']
+        translate_artist_names(params_dict, spotify)
+
+        self.assertEqual(params_dict["seed_artists"], "id1,id2")
+
+    @patch('src.logic.SpotifyAPIClass.query_api')
+    def test_translate_track_names(self, mock_query_api):
+        params_dict = {"seed_tracks": "Track1,Track2"}
+        spotify = SpotifyAPIClass()
+
+        mock_query_api.side_effect = ['id1', 'id2']
+        translate_track_names(params_dict, spotify)
+
+        self.assertEqual(params_dict["seed_tracks"], "id1,id2")
+
+    # Add more tests for other functions as needed
+
+
+if __name__ == '__main__':
+    unittest.main()

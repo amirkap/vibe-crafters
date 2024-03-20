@@ -20,4 +20,4 @@ async def recommended_artists():
 
 
 #result = get_playlist(Playlist(event="Driving to the beach_new", music_genre="rock", mood="angry"))
-result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))
+result = get_playlist(Playlist(event="Disco Night", music_genre="disco", mood="happy"))
