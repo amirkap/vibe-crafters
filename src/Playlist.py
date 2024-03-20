@@ -2,31 +2,20 @@ from datetime import datetime
 from pydantic import BaseModel, field_validator
 from src.music_genre import MusicGenre
 from src.mood import Mood
+from src.decade import Decade
 import re
 from typing import Optional
 
 
 
 class Playlist(BaseModel):
+    """
+    A class to represent a playlist input parameters form the user to the API.
+    """
     event: str
     music_genre: MusicGenre
     mood: Optional[Mood] = None
-    year_range: Optional[str] = None
-
-    @field_validator('year_range')
-    @classmethod
-    def validate_year_range(cls, v):
-        if not re.match(r'^\d{4}-\d{4}$', v):
-            raise ValueError('Year range must be in the format "start_year-end_year"')
-        start_year, end_year = map(int, v.split('-'))
-        current_year = datetime.now().year
-        if start_year < 1900:
-            raise ValueError('Start year must not be earlier than 1900')
-        if end_year > current_year:
-            raise ValueError('End year must not be later than the current year')
-        if start_year > end_year:
-            raise ValueError('Start year must be less than end year')
-        return v
+    decade: Optional[Decade] = None
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -35,6 +24,6 @@ class Playlist(BaseModel):
         return_string = f"Event: {self.event}, Music Genre: {self.music_genre.value}"
         if self.mood:
             return_string += f", Mood: {self.mood.value}"
-        if self.year_range:
-            return_string += f", Year Range: {self.year_range}"
+        if self.decade:
+            return_string += f", Decade: {self.decade}"
         return return_string

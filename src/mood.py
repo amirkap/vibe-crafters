@@ -1,6 +1,9 @@
 from enum import Enum
 
 class Mood(Enum):
+    """
+    An enumeration representing the possible input of mood for a playlist.
+    """
     SAD = 'sad'
     CALM = 'calm'
     HAPPY = 'happy'
@@ -53,6 +56,6 @@ class Mood(Enum):
             return value
         try:
             value = value.lower()
+            return cls(value)
         except AttributeError:
             raise ValueError(f"Invalid value for Mood: {value}")
-        return cls(value)

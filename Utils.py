@@ -17,12 +17,33 @@ genres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime",
 category_to_id = {'New Releases': '0JQ5DAqbMKFz6FAsUtgAab', 'Pop': '0JQ5DAqbMKFEC4WFtoNRpw', 'Hip-Hop': '0JQ5DAqbMKFQ00XGBls6ym', 'Rock': '0JQ5DAqbMKFDXXwE9BDJAr', 'Latin': '0JQ5DAqbMKFxXaXKP7zcDp', 'Charts': '0JQ5DAudkNjCgYMM0TZXDw', 'Dance/Electronic': '0JQ5DAqbMKFHOzuVTgTizF', 'Mood': '0JQ5DAqbMKFzHmL4tf05da', 'Indie': '0JQ5DAqbMKFCWjUTdzaG0e', 'Workout': '0JQ5DAqbMKFAXlCG6QvYQ4', 'Discover': '0JQ5DAtOnAEpjOgUKwXyxj', 'Country': '0JQ5DAqbMKFKLfwjuJMoNC', 'R&B': '0JQ5DAqbMKFEZPnFQSFB1T', 'K-pop': '0JQ5DAqbMKFGvOw3O4nLAf', 'Chill': '0JQ5DAqbMKFFzDl7qN9Apr', 'Sleep': '0JQ5DAqbMKFCuoRTxhYWow', 'Party': '0JQ5DAqbMKFA6SOHvT3gck', 'At Home': '0JQ5DAqbMKFx0uLQR2okcc', 'Decades': '0JQ5DAqbMKFIVNxQgRNSg0', 'Love': '0JQ5DAqbMKFAUsdyVjCQuL', 'Metal': '0JQ5DAqbMKFDkd668ypn6O', 'Jazz': '0JQ5DAqbMKFAJ5xb0fwo9m', 'Trending': '0JQ5DAqbMKFQIL0AXnG5AK', 'Wellness': '0JQ5DAqbMKFLb2EqgLtpjC', 'Anime': '0JQ5DAqbMKFziKOShCi009', 'Gaming': '0JQ5DAqbMKFCfObibaOZbv', 'Folk & Acoustic': '0JQ5DAqbMKFy78wprEpAjl', 'Focus': '0JQ5DAqbMKFCbimwdOYlsl', 'Soul': '0JQ5DAqbMKFIpEuaCnimBj', 'Kids & Family': '0JQ5DAqbMKFFoimhOqWzLB', 'Classical': '0JQ5DAqbMKFPrEiAOxgac3', 'TV & Movies': '0JQ5DAqbMKFOzQeOmemkuw', 'Instrumental': '0JQ5DAqbMKFRieVZLLoo9m', 'Punk': '0JQ5DAqbMKFAjfauKLOZiv', 'Ambient': '0JQ5DAqbMKFLjmiZRss79w', 'Netflix': '0JQ5DAqbMKFEOEBCABAxo9', 'Blues': '0JQ5DAqbMKFQiK2EHwyjcU', 'Cooking & Dining': '0JQ5DAqbMKFRY5ok2pxXJ0', 'Alternative': '0JQ5DAqbMKFFtlLYUHv8bT', 'Travel': '0JQ5DAqbMKFAQy4HL4XU2D', 'Caribbean': '0JQ5DAqbMKFObNLOHydSW8', 'Afro': '0JQ5DAqbMKFNQ0fGp4byGU', 'GLOW': '0JQ5DAqbMKFGnsSfvg90Wo', 'Songwriters': '0JQ5DAqbMKFSCjnQr8QZ3O', 'Nature & Noise': '0JQ5DAqbMKFI3pNLtYMD9S', 'Funk & Disco': '0JQ5DAqbMKFFsW9N8maB6z', 'League of Legends': '0JQ5DAqbMKFLYQVFHcXMae', 'Spotify Singles': '0JQ5DAqbMKFDBgllo2cUIN', 'Summer': '0JQ5DAqbMKFLVaM30PMBm4', 'EQUAL': '0JQ5DAqbMKFPw634sFwguI', 'RADAR': '0JQ5DAqbMKFOOxftoKZxod', 'Fresh Finds': '0JQ5DAqbMKFImHYGo3eTSg', 'Tastemakers': '0JQ5DAqbMKFRKBHIxJ5hMm'}
 
 def parse_params_to_dict(input_str):
-    params_dict = ast.literal_eval(input_str)
+    """
+    Parse the input string into a dictionary.
+    Args:
+        input_str: A string representing a dictionary.
+
+    Returns:
+        A dictionary containing the key-value pairs from the input string.
+    """
+    try:
+        params_dict = ast.literal_eval(input_str)
+    except Exception as e:
+        return {"Error": "Invalid input string"}
+
+    if not isinstance(params_dict, dict):
+        return {"Error": "Input string is not a dictionary"}
 
     return params_dict
 
-
 def extract_nearest_neighbours_input(params_dict):
+    """
+    Extract the keys and values from the input dictionary that are relevant for the nearest neighbours search.
+    Args:
+        params_dict: A dictionary containing the input parameters for the spotify API.
+
+    Returns:
+        A dictionary containing the relevant keys and values for the nearest neighbours search.
+    """
     knn_keys = [
         "target_acousticness", "target_danceability",
         "target_energy", "target_instrumentalness", "target_valence"
@@ -38,6 +59,13 @@ def extract_nearest_neighbours_input(params_dict):
 
 
 def validate_and_fix_dict(params_dict, add_artists=True):
+    """
+    Validates the input dictionary and removes any keys that are not valid Spotify parameters, in place.
+    Args:
+        params_dict: A dictionary containing the input parameters for the spotify API.
+        add_artists: A boolean indicating whether to add the seed_artists parameter to the dictionary.
+
+    """
     spotify_params = [
         "min_acousticness", "max_acousticness",
         "min_danceability", "max_danceability",
@@ -62,6 +90,14 @@ def validate_and_fix_dict(params_dict, add_artists=True):
             params_dict["seed_tracks"] = ",".join(params_dict["seed_tracks"])
 
 def limit_dict_seeds_number(params_dict, add_artists=True):
+    """
+    Limits the number of seed artists and seed tracks in the input dictionary to 2 and 4, respectively, in place.
+    In total, together with the one seed genre, no more than 4 seed tracks and artists are allowed.
+    Args:
+        params_dict: A dictionary containing the input parameters for the spotify API.
+        add_artists: A boolean indicating whether to add the seed_artists parameter to the dictionary.
+
+    """
     # validates that no more than a total of 4 seed tracks and artists are given
     seed_artists = []
     seed_tracks = []
@@ -89,22 +125,19 @@ def limit_dict_seeds_number(params_dict, add_artists=True):
             if len(seed_tracks) > 2:
                 params_dict["seed_tracks"] = ",".join(seed_tracks[:2])
         else:
-            if len(seed_tracks) > 5:
-                params_dict["seed_tracks"] = ",".join(seed_tracks[:5])
+            if len(seed_tracks) > 4:
+                params_dict["seed_tracks"] = ",".join(seed_tracks[:4])
 
 
 
 def correct_audio_values_in_place(predict_audio_features):
-    audio_values_diff = {
-        'danceability': 0.009000000000000008,
-        'energy': -0.04799999999999999,
-        'loudness': -0.054000000000000714,
-        'speechiness': -0.0009999999999999974,
-        'acousticness': 0.000969,
-        'instrumentalness': 3.4200000000000003e-06,
-        'liveness': -0.016249999999999994,
-        'valence': -0.049000000000000016,
-        'tempo': -5.667500000000004}
+    """
+    Corrects the audio feature values in place, by adding or subtracting a set of values which gpt is not
+    perfectly predicting, in place.
+    Args:
+        predict_audio_features: A dictionary containing the predicted audio features.
+
+    """
 
     audio_values_diff = {
         'danceability': 0.009000000000000008, 'energy': -0.04799999999999999,

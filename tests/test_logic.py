@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from src.logic import (
     find_seed_tracks_by_playlist_id,
     find_seed_artists_by_playlist_id,
-    filter_tracks_by_year_range,
+    filter_tracks_by_decade,
     translate_artist_names,
     translate_track_names,
     SpotifyAPIClass,
@@ -142,7 +142,7 @@ class TestLogic(unittest.TestCase):
             {'album': {'release_date': '2023-01-01'}}
         ]
 
-        result = filter_tracks_by_year_range(mock_tracks, '2021-2022')
+        result = filter_tracks_by_decade(mock_tracks, '2021-2022')
 
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['album']['release_date'][:4], '2021')

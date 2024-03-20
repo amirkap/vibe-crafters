@@ -1,10 +1,12 @@
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
-# from src.Playlist import Playlist
 
 
 class OpenAIClass:
+    """
+    This class is used to connect to the OpenAI API and get the chat response from the API.
+    """
 
     def __init__(self):
         load_dotenv()
@@ -117,8 +119,4 @@ def get_assesment_user_prompt(tracks_list):
 
 
 openai = OpenAIClass()
-# user_input = Playlist(event="Casual driving on the coastline", music_genre="indie", mood="happy",
-#                       year_range="2010-2020")
-# response = openai.get_chat_response_from_openai(get_main_system_prompt(), get_user_prompt(user_input))
-# print(response)
 

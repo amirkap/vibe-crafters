@@ -9,31 +9,90 @@ import random
 
 
 def get_playlist(user_input: Playlist):
+    """
+    This function is the main entry point for the API. It takes a Playlist object as input and returns a URL to a Spotify.
+    Args:
+        user_input: A Playlist object containing the user's input parameters.
+
+    Returns:
+        A string containing the URL to the playlist on Spotify.
+    """
     return convert_to_spotify_params_and_create_playlist(user_input)
 
 
 def get_recommended_artists():
     pass
 
+def get_decades_start_and_end_years():
+    """
+    Get the start and end years for each decade from the 1950s to the 2020s.
+    Returns:
+        A dictionary containing the start and end years for each decade.
+    """
+    decades_years = {
+        '1950s': {'start_year': 1950, 'end_year': 1959},
+        '1960s': {'start_year': 1960, 'end_year': 1969},
+        '1970s': {'start_year': 1970, 'end_year': 1979},
+        '1980s': {'start_year': 1980, 'end_year': 1989},
+        '1990s': {'start_year': 1990, 'end_year': 1999},
+        '2000s': {'start_year': 2000, 'end_year': 2009},
+        '2010s': {'start_year': 2010, 'end_year': 2019},
+        '2020s': {'start_year': 2020, 'end_year': 2029},
+    }
 
-def filter_tracks_by_year_range(recommended_tracks, year_range: str):
-    start_year, end_year = tuple(year_range.split('-'))
-    return [track for track in recommended_tracks if start_year <= track["album"]["release_date"][:4] <= end_year]
+    return decades_years
+
+
+def filter_tracks_by_decade(recommended_tracks, decade: str):
+    """
+    Filter the recommended tracks by the given year range.
+    Args:
+        recommended_tracks: A list of dictionaries representing the recommended tracks.
+        decade: A string representing the year range in the format "start_year-end_year".
+
+    Returns:
+        A list of dictionaries representing the filtered recommended tracks.
+    """
+
+    decade_years = get_decades_start_and_end_years()
+    start_year, end_year = decade_years[decade]["start_year"], decade_years[decade]["end_year"]
+    return [track for track in recommended_tracks if start_year <= int(track["album"]["release_date"][:4]) <= end_year]
 
 
 def translate_artist_names(params_dict, spotify):
+    """
+    Translate the artist names to their corresponding Spotify IDs.
+    Args:
+        params_dict: A dictionary containing the input parameters for the Spotify API.
+        spotify: An instance of the SpotifyAPIClass.
+    """
     artist_names = params_dict["seed_artists"].split(",")
     artist_ids = [spotify.query_api("get_artist_id", {"artist_name": artist_name}) for artist_name in artist_names]
     params_dict["seed_artists"] = ",".join(artist_ids)
 
 
 def translate_track_names(params_dict, spotify):
+    """
+    Translate the track names to their corresponding Spotify IDs.
+    Args:
+        params_dict: A dictionary containing the input parameters for the Spotify API.
+        spotify: An instance of the SpotifyAPIClass.
+    """
     track_names = params_dict["seed_tracks"]
     track_ids = [spotify.query_api("get_track_id", {"track_name": track_name}) for track_name in track_names]
     params_dict["seed_tracks"] = ",".join(track_ids)
 
 
 def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
+    """
+    The main logic for the API. It takes a Playlist object as input, converts the input parameters to the corresponding
+    Spotify API parameters, and creates a playlist on Spotify.
+    Args:
+        user_input: A Playlist object containing the user's input parameters.
+
+    Returns:
+        A string containing the URL to the playlist on Spotify.
+    """
     openai = OpenAIClass()
     spotify = SpotifyAPIClass()
 
@@ -91,7 +150,7 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
 
         recommended_tracks = find_min_num_of_tracks_with_gpt_seeds(40, params_dict, spotify, seed_tracks_names, user_input, num_attempts)
 
-    if not user_input["year_range"]:
+    if not user_input["decade"]:
         print(f"KNN values: {knn_values_dict}")
         knn_tracks = find_nearest_neighbors_by_genre(knn_values_dict, user_input["music_genre"].value, 10)
         print(f"KNN tracks: {knn_tracks}")
@@ -106,6 +165,15 @@ def convert_to_spotify_params_and_create_playlist(user_input: Playlist):
 
 
 def get_new_seed_tracks_names(prev_seed_tracks, user_input: Playlist):
+    """
+    Get new seed tracks based on the user input. The songs have to be different from the previous seed tracks.
+    Args:
+        prev_seed_tracks: A list of strings representing the previous seed tracks.
+        user_input: A Playlist object containing the user's input parameters.
+
+    Returns:
+        A list of strings representing the new seed tracks.
+    """
     openai = OpenAIClass()
     response = openai.get_chat_response_from_openai(get_extra_songs_system_prompt(prev_seed_tracks),
                                                     user_input.__str__())
@@ -114,10 +182,23 @@ def get_new_seed_tracks_names(prev_seed_tracks, user_input: Playlist):
     return seed_tracks_list
 
 def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, user_input, num_attempts=3):
+    """
+    Find the minimum number of unique tracks based on the given input parameters, extracting
+    seed songs from the Spotify API.
+    Args:
+        min_num: An integer representing the minimum number of unique tracks to find.
+        params_dict: A dictionary containing the input parameters for the Spotify API.
+        spotify: An instance of the SpotifyAPIClass.
+        user_input: A Playlist object containing the user's input parameters.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A list of strings representing the unique track IDs or None if an error occurred.
+    """
     attempts = 0
     max_attempts = num_attempts
     unique_tracks = []
-    year_range = None
+    decade = None
     add_artists = True
 
     if not params_dict["seed_tracks"] or not params_dict["seed_artists"]:
@@ -130,8 +211,8 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
     print("full_seed_tracks:", full_seed_tracks)
     print("full_seed_artists:", full_seed_artists)
 
-    if user_input["year_range"]:
-        year_range = user_input["year_range"]
+    if user_input["decade"]:
+        decade = user_input["decade"]
 
     while attempts < max_attempts and len(unique_tracks) < min_num:
         print("indexeds:", attempts*2, attempts*2+2)
@@ -146,9 +227,9 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
             print(f"Error in get_recommendations()! Returned value is: {recommended_tracks}")
             return recommended_tracks
 
-        if year_range:
+        if decade:
             print(f"Before filtering: {len(recommended_tracks)} tracks")
-            recommended_tracks = filter_tracks_by_year_range(recommended_tracks, year_range)
+            recommended_tracks = filter_tracks_by_decade(recommended_tracks, decade)
             print(f"After filtering: {len(recommended_tracks)} tracks")
 
         # Add new unique tracks to the set
@@ -168,15 +249,29 @@ def find_min_num_of_tracks_with_spotify_seeds(min_num, params_dict, spotify, use
     return unique_tracks
 
 def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tracks_names, user_input, num_attempts=3):
+    """
+    Find the minimum number of unique tracks based on the given input parameters, extracting
+    seed songs from the Openai API. Trying to find seed tracks that are not in the previous seed tracks.
+    Args:
+        min_num: An integer representing the minimum number of unique tracks to find.
+        params_dict: A dictionary containing the input parameters for the Spotify API.
+        spotify: An instance of the SpotifyAPIClass.
+        seed_tracks_names: A list of strings representing the seed track names.
+        user_input: A Playlist object containing the user's input parameters.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A list of strings representing the unique track IDs or None if an error occurred.
+    """
     attempts = 0
     max_attempts = num_attempts
     unique_tracks = []
     seed_tracks_list = seed_tracks_names.split(",")
-    year_range = None
+    decade = None
     add_artists = True
 
-    if user_input["year_range"]:
-        year_range = user_input["year_range"]
+    if user_input["decade"]:
+        decade = user_input["decade"]
 
     while attempts < max_attempts and len(unique_tracks) < min_num:
         validate_and_fix_dict(params_dict, add_artists)
@@ -188,9 +283,9 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
             print(f"Error in get_recommendations()! Returned value is: {recommended_tracks}")
             return recommended_tracks
 
-        if year_range:
+        if decade:
             print(f"Before filtering: {len(recommended_tracks)} tracks")
-            recommended_tracks = filter_tracks_by_year_range(recommended_tracks, year_range)
+            recommended_tracks = filter_tracks_by_decade(recommended_tracks, decade)
             print(f"After filtering: {len(recommended_tracks)} tracks")
 
         # Add new unique tracks to the set
@@ -214,10 +309,21 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
     unique_tracks = [track["id"] for track in unique_tracks]
     return unique_tracks
 
-def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts):
+def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts=3):
+    """
+    Find seed tracks and artists based on the given input parameters, extracting seed songs from the Spotify API.
+    Args:
+        user_input: A Playlist object containing the user's input parameters.
+        num_attempts: An integer representing the maximum number of attempts to make (important in order to know
+        how many seed tracks and artists to return).
+
+    Returns:
+        A dictionary containing the seed tracks and artists or None if an error occurred.
+    """
     spotify = SpotifyAPIClass()
     mood_provided = user_input["mood"] is not None
-    playlist_search = f'{user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
+    decade_provided = user_input["decade"] is not None
+    playlist_search = f'{user_input["decade"].value if decade_provided else ""} {user_input["mood"].value if mood_provided else ""} {user_input["music_genre"].value}'
     playlist_response = spotify.search_item('playlist', playlist_search)
 
     if not playlist_response:
@@ -228,14 +334,27 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts
         return None
 
     print(f"Playlist ID: {playlist_id}")
-    seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts)
-    seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
+    # seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts)
+    # seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
+    seed_tracks = get_most_popular_tracks(playlist_id, spotify, num_attempts)
+    seed_artists = get_most_popular_artists(playlist_id, spotify, num_attempts)
 
     return {"seed_tracks": seed_tracks, "seed_artists": seed_artists}
 
 
 
 def find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts):
+    """
+    Find seed tracks based on the given playlist ID. Selects tracks randomly from the playlist.
+    Finds two tracks for every attempt.
+    Args:
+        playlist_id: A string representing the playlist ID.
+        spotify: An instance of the SpotifyAPIClass.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A string containing the seed tracks or None if an error occurred.
+    """
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
@@ -249,6 +368,17 @@ def find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts):
     return seed_tracks_str
 
 def find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts):
+    """
+    Find seed artists based on the given playlist ID. Selects artists randomly from the playlist.
+    Finds two artists for every attempt.
+    Args:
+        playlist_id: A string representing the playlist ID.
+        spotify: An instance of the SpotifyAPIClass.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A string containing the seed artists or None if an error occurred.
+    """
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
@@ -266,6 +396,17 @@ def find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts):
     return seed_artists_str
 
 def get_most_popular_artists(playlist_id, spotify, num_attempts):
+    """
+    Get the most popular artists based on the given playlist ID.
+    Finds two artists for every attempt.
+    Args:
+        playlist_id: A string representing the playlist ID.
+        spotify: An instance of the SpotifyAPIClass.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A string containing the seed artists or None if an error occurred.
+    """
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
@@ -279,10 +420,20 @@ def get_most_popular_artists(playlist_id, spotify, num_attempts):
     print(sorted_ids_and_popularity)
     seed_artists = [x[0] for x in sorted_ids_and_popularity][:6]
     #seed_artists = sorted(artists_ids, key=lambda x: spotify.get_artist(x)["popularity"], reverse=True)
-
-    return seed_artists
+    seed_artists_str = ",".join(seed_artists)
+    return seed_artists_str
 
 def get_most_popular_tracks(playlist_id, spotify, num_attempts):
+    """
+    Gets the most popular tracks based on the given playlist ID. Finds two tracks for every attempt.
+    Args:
+        playlist_id: A string representing the playlist ID.
+        spotify: An instance of the SpotifyAPIClass.
+        num_attempts: An integer representing the maximum number of attempts to make.
+
+    Returns:
+        A string containing the seed tracks or None if an error occurred.
+    """
     playlist_tracks = spotify.get_playlist_songs(playlist_id)
     if not playlist_tracks:
         return None
@@ -293,8 +444,8 @@ def get_most_popular_tracks(playlist_id, spotify, num_attempts):
     ids_and_popularity = [(track_id, spotify.get_track(track_id)["popularity"]) for track_id in tracks_ids]
     sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
     seed_tracks = [x[0] for x in sorted_ids_and_popularity][:6]
-
-    return seed_tracks
+    seed_tracks_str = ",".join(seed_tracks)
+    return seed_tracks_str
 
 spotify = SpotifyAPIClass()
 # print(find_seed_artists_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))

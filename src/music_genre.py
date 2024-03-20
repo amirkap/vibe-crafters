@@ -1,7 +1,12 @@
 from enum import Enum
 
+from pydantic import ValidationError
+
 
 class MusicGenre(str, Enum):
+    """
+    A class to represent the possible music genre input parameter from the user to the API.
+    """
     ACOUSTIC = "acoustic"
     AFROBEAT = "afrobeat"
     ALT_ROCK = "alt-rock"
@@ -134,11 +139,13 @@ class MusicGenre(str, Enum):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value, values : dict):
+    def validate(cls, value, values: dict):
         if isinstance(value, cls):
             return value
         try:
             value = value.lower().replace(' ', '-')
-        except AttributeError:
+            return cls(value)
+        except ValidationError:
             raise ValueError(f"Invalid value for MusicGenre: {value}")
-        return cls(value)
+        except ValueError:
+            raise ValueError(f"Value {value} is not a valid MusicGenre")
