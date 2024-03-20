@@ -137,19 +137,130 @@ class TestLogic(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(len(result.split(',')), 4)
 
-    def test_filter_tracks_by_year_range(self):
-        mock_tracks = [
-            {'album': {'release_date': '2020-01-01'}},
-            {'album': {'release_date': '2021-01-01'}},
-            {'album': {'release_date': '2022-01-01'}},
-            {'album': {'release_date': '2023-01-01'}}
+    def test_filter_tracks_by_decade(self):
+        # Sample recommended tracks with the updated format
+        recommended_tracks = [
+            {
+                "album": {
+                    "release_date": "1975-03-11",
+                    "name": "Album 1"
+                },
+                "name": "Bohemian Rhapsody"
+            },
+            {
+                "album": {
+                    "release_date": "1984-01-21",
+                    "name": "Album 2"
+                },
+                "name": "Jump"
+            },
+            {
+                "album": {
+                    "release_date": "1991-09-24",
+                    "name": "Album 3"
+                },
+                "name": "Smells Like Teen Spirit"
+            },
+            {
+                "album": {
+                    "release_date": "2003-06-09",
+                    "name": "Album 4"
+                },
+                "name": "Seven Nation Army"
+            },
+            {
+                "album": {
+                    "release_date": "2014-05-27",
+                    "name": "Album 5"
+                },
+                "name": "Uptown Funk"
+            },
+            {
+                "album": {
+                    "release_date": "2021-07-30",
+                    "name": "Album 6"
+                },
+                "name": "Stay"
+            }
         ]
 
-        result = filter_tracks_by_decade(mock_tracks, '2021-2022')
+        # Test filtering by 1970s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '1970s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "1975-03-11",
+                    "name": "Album 1"
+                },
+                "name": "Bohemian Rhapsody"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
 
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]['album']['release_date'][:4], '2021')
-        self.assertEqual(result[1]['album']['release_date'][:4], '2022')
+        # Test filtering by 1980s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '1980s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "1984-01-21",
+                    "name": "Album 2"
+                },
+                "name": "Jump"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
+
+        # Test filtering by 1990s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '1990s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "1991-09-24",
+                    "name": "Album 3"
+                },
+                "name": "Smells Like Teen Spirit"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
+
+        # Test filtering by 2000s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '2000s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "2003-06-09",
+                    "name": "Album 4"
+                },
+                "name": "Seven Nation Army"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
+
+        # Test filtering by 2010s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '2010s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "2014-05-27",
+                    "name": "Album 5"
+                },
+                "name": "Uptown Funk"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
+
+        # Test filtering by 2020s
+        filtered_tracks = filter_tracks_by_decade(recommended_tracks, '2020s')
+        expected_tracks = [
+            {
+                "album": {
+                    "release_date": "2021-07-30",
+                    "name": "Album 6"
+                },
+                "name": "Stay"
+            }
+        ]
+        assert filtered_tracks == expected_tracks
 
     @patch('src.logic.SpotifyAPIClass.query_api')
     def test_translate_artist_names(self, mock_query_api):

@@ -4,7 +4,7 @@ from pydantic import ValidationError
 
 from src.music_genre import MusicGenre
 from src.Playlist import Playlist
-from src.logic import get_playlist, get_recommended_artists
+from src.logic import get_playlist
 import logging
 
 # Configure logging to write to a file
@@ -29,13 +29,6 @@ async def create_playlist(playlist: Playlist):
     except Exception as e:
         logger.error(f"Error creating playlist: {e}")
         raise HTTPException(status_code=500, detail="Error in creating playlist. Please try again.")
-
-
-@app.get("/recommended_artists")
-async def recommended_artists():
-    result = get_recommended_artists()
-    return result
-
 
 result = get_playlist(Playlist(event="sad 10s", music_genre="pop", mood="sad", decade="2000s"))
 #result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))

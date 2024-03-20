@@ -16,7 +16,107 @@ mock_openai_response = '''{
 mock_find_spotify_seeds_response = {"seed_tracks": "7g4I3DeFlZLeqMjw0ONBqs,7fu3Tv5rcoGD1PZV7s57WW",
                                     "seed_artists": "6PpGPIrFf3LM7Q77eR4Bts,0Xf8oDAJYd2D0k3NLI19OV"}
 mock_find_min_tracks_response = ['2QaTacWkV0bC68QYNCI3k6', '1spr3ff7dxssldzMZmoITf', '5AIKhsRdThwwXMRoHpYPRt', '5FMlvzPFVvHTvz8V2bwvpp', '6k8Ckm7e5IRwWSIeAduP4b', '79OzqW7Dril4hY5gu1XA8z', '3HsBtrErYQjxf4Pv2p05Oy', '3xBGofZKEsxXHJu7ACzrao', '55cMXcQ8FltQchOV84EhyX', '3pNFl9UJAMlFXCGnkBZoDz']
-
+mock_get_recommendations_response = json.loads('''[
+  {
+    "album": {
+      "album_type": "compilation",
+      "total_tracks": 9,
+      "available_markets": [
+        "CA",
+        "BR",
+        "IT"
+      ],
+      "external_urls": {
+        "spotify": "string"
+      },
+      "href": "string",
+      "id": "2up3OPMp9Tb4dAKM2erWXQ",
+      "images": [
+        {
+          "url": "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+          "height": 300,
+          "width": 300
+        }
+      ],
+      "name": "string",
+      "release_date": "1981-12",
+      "release_date_precision": "year",
+      "restrictions": {
+        "reason": "market"
+      },
+      "type": "album",
+      "uri": "spotify:album:2up3OPMp9Tb4dAKM2erWXQ",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "string"
+          },
+          "href": "string",
+          "id": "string",
+          "name": "string",
+          "type": "artist",
+          "uri": "string"
+        }
+      ]
+    },
+    "artists": [
+      {
+        "external_urls": {
+          "spotify": "string"
+        },
+        "followers": {
+          "href": "string",
+          "total": 0
+        },
+        "genres": [
+          "Prog rock",
+          "Grunge"
+        ],
+        "href": "string",
+        "id": "string",
+        "images": [
+          {
+            "url": "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+            "height": 300,
+            "width": 300
+          }
+        ],
+        "name": "string",
+        "popularity": 0,
+        "type": "artist",
+        "uri": "string"
+      }
+    ],
+    "available_markets": [
+      "string"
+    ],
+    "disc_number": 0,
+    "duration_ms": 0,
+    "explicit": false,
+    "external_ids": {
+      "isrc": "string",
+      "ean": "string",
+      "upc": "string"
+    },
+    "external_urls": {
+      "spotify": "string"
+    },
+    "href": "string",
+    "id": "string",
+    "is_playable": false,
+    "linked_from": {},
+    "restrictions": {
+      "reason": "string"
+    },
+    "name": "string",
+    "popularity": 0,
+    "preview_url": "string",
+    "track_number": 0,
+    "type": "track",
+    "uri": "string",
+    "is_local": false
+  }
+]''')
 mock_search_item_response = {
     "playlists": {
         "href": "https://api.spotify.com/v1/search?query=80s+happy+disco&type=playlist&market=US&offset=0&limit=10",
