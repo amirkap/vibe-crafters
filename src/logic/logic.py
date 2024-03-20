@@ -54,7 +54,7 @@ def translate_track_names(params_dict, spotify):
         params_dict: A dictionary containing the input parameters for the Spotify API.
         spotify: An instance of the SpotifyAPIClass.
     """
-    track_names = params_dict["seed_tracks"]
+    track_names = params_dict["seed_tracks"].split(",")
     track_ids = [spotify.query_api("get_track_id", {"track_name": track_name}) for track_name in track_names]
     params_dict["seed_tracks"] = ",".join(track_ids)
 
@@ -280,6 +280,7 @@ def find_min_num_of_tracks_with_gpt_seeds(min_num, params_dict, spotify, seed_tr
             add_artists = False
             params_dict['seed_tracks'] = get_new_seed_tracks_names(seed_tracks_list, user_input)
             seed_tracks_list.append(params_dict['seed_tracks'])
+            params_dict['seed_tracks'] = ",".join(params_dict['seed_tracks'])
             translate_track_names(params_dict, spotify)
 
     unique_tracks = [track["id"] for track in unique_tracks]
@@ -312,8 +313,8 @@ def find_seed_tracks_and_artists_from_spotify(user_input: Playlist, num_attempts
     print(f"Playlist ID: {playlist_id}")
     # seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts)
     # seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
-    seed_tracks = get_most_popular_tracks(playlist_id, spotify, num_attempts)
-    seed_artists = get_most_popular_artists(playlist_id, spotify, num_attempts)
+    seed_tracks = find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts)
+    seed_artists = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
 
     return {"seed_tracks": seed_tracks, "seed_artists": seed_artists}
 

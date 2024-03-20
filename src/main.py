@@ -4,15 +4,7 @@ from pydantic import ValidationError
 
 from src.models.Playlist import Playlist
 from src.logic.logic import get_playlist
-import logging
-
-# Configure logging to write to a file
-logging.basicConfig(
-    filename='VibeCreatorsExceptions.log',
-    level=logging.WARNING,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+from src.logger import *
 
 # run the FastAPI app
 app = FastAPI()
