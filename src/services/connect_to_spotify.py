@@ -28,8 +28,6 @@ class SpotifyAPIClass:
             if current_time >= token_expiry:
                 # Token has expired, request a new one
                 self.refresh_token_and_update_env()
-            else:
-                print("Existing token is still valid.")
         else:
             # No token expiry set, fetch a new token
             self.refresh_token_and_update_env()
@@ -67,7 +65,7 @@ class SpotifyAPIClass:
 
         """
         expiry_time = datetime.now() + timedelta(seconds=expires_in)
-        env_path = '../.env'
+        env_path = '.env'
         set_key(env_path, "ACCESS_TOKEN", access_token)
         set_key(env_path, "TOKEN_EXPIRY", expiry_time.strftime("%Y-%m-%d %H:%M:%S"))
         if refresh_token:
@@ -79,7 +77,6 @@ class SpotifyAPIClass:
         os.environ["ACCESS_TOKEN"] = new_token_data["access_token"]
         load_dotenv()
         self.access_token = os.getenv("ACCESS_TOKEN")
-        print("Token updated.")
 
     def refresh_access_token(self):
         """
@@ -100,7 +97,6 @@ class SpotifyAPIClass:
         }
 
         response = requests.post(url, headers=headers, data=data)
-        print("This is the response", response.json())
         return response.json()
 
     def refresh_token_and_update_env(self):
@@ -112,7 +108,6 @@ class SpotifyAPIClass:
         os.environ["ACCESS_TOKEN"] = new_token_data["access_token"]
         load_dotenv()
         self.access_token = os.getenv("ACCESS_TOKEN")
-        print("Token updated.")
 
     def query_api(self, func_name, kwargs, iteration_no=0):
         """
@@ -127,11 +122,6 @@ class SpotifyAPIClass:
         """
         method = getattr(self, func_name)
         response = method(**kwargs)
-        if func_name == "get_recommendations" and "error" not in response:
-            only_tracks = [track["uri"] for track in response]
-            print(f"Response of '{func_name}()': {only_tracks}")
-        else:
-            print(f"Response of '{func_name}()': {response}")
         if "error" in response:
             if response["error"]["status"] == 401 and iteration_no < 2:
                 if response["error"]["message"] in ["The access token expired", "Invalid access token"]:

@@ -1,4 +1,5 @@
 import ast
+
 genres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues",
           "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical",
           "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco",
@@ -14,7 +15,33 @@ genres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime",
           "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop",
           "turkish", "work-out", "world-music"]
 
-category_to_id = {'New Releases': '0JQ5DAqbMKFz6FAsUtgAab', 'Pop': '0JQ5DAqbMKFEC4WFtoNRpw', 'Hip-Hop': '0JQ5DAqbMKFQ00XGBls6ym', 'Rock': '0JQ5DAqbMKFDXXwE9BDJAr', 'Latin': '0JQ5DAqbMKFxXaXKP7zcDp', 'Charts': '0JQ5DAudkNjCgYMM0TZXDw', 'Dance/Electronic': '0JQ5DAqbMKFHOzuVTgTizF', 'Mood': '0JQ5DAqbMKFzHmL4tf05da', 'Indie': '0JQ5DAqbMKFCWjUTdzaG0e', 'Workout': '0JQ5DAqbMKFAXlCG6QvYQ4', 'Discover': '0JQ5DAtOnAEpjOgUKwXyxj', 'Country': '0JQ5DAqbMKFKLfwjuJMoNC', 'R&B': '0JQ5DAqbMKFEZPnFQSFB1T', 'K-pop': '0JQ5DAqbMKFGvOw3O4nLAf', 'Chill': '0JQ5DAqbMKFFzDl7qN9Apr', 'Sleep': '0JQ5DAqbMKFCuoRTxhYWow', 'Party': '0JQ5DAqbMKFA6SOHvT3gck', 'At Home': '0JQ5DAqbMKFx0uLQR2okcc', 'Decades': '0JQ5DAqbMKFIVNxQgRNSg0', 'Love': '0JQ5DAqbMKFAUsdyVjCQuL', 'Metal': '0JQ5DAqbMKFDkd668ypn6O', 'Jazz': '0JQ5DAqbMKFAJ5xb0fwo9m', 'Trending': '0JQ5DAqbMKFQIL0AXnG5AK', 'Wellness': '0JQ5DAqbMKFLb2EqgLtpjC', 'Anime': '0JQ5DAqbMKFziKOShCi009', 'Gaming': '0JQ5DAqbMKFCfObibaOZbv', 'Folk & Acoustic': '0JQ5DAqbMKFy78wprEpAjl', 'Focus': '0JQ5DAqbMKFCbimwdOYlsl', 'Soul': '0JQ5DAqbMKFIpEuaCnimBj', 'Kids & Family': '0JQ5DAqbMKFFoimhOqWzLB', 'Classical': '0JQ5DAqbMKFPrEiAOxgac3', 'TV & Movies': '0JQ5DAqbMKFOzQeOmemkuw', 'Instrumental': '0JQ5DAqbMKFRieVZLLoo9m', 'Punk': '0JQ5DAqbMKFAjfauKLOZiv', 'Ambient': '0JQ5DAqbMKFLjmiZRss79w', 'Netflix': '0JQ5DAqbMKFEOEBCABAxo9', 'Blues': '0JQ5DAqbMKFQiK2EHwyjcU', 'Cooking & Dining': '0JQ5DAqbMKFRY5ok2pxXJ0', 'Alternative': '0JQ5DAqbMKFFtlLYUHv8bT', 'Travel': '0JQ5DAqbMKFAQy4HL4XU2D', 'Caribbean': '0JQ5DAqbMKFObNLOHydSW8', 'Afro': '0JQ5DAqbMKFNQ0fGp4byGU', 'GLOW': '0JQ5DAqbMKFGnsSfvg90Wo', 'Songwriters': '0JQ5DAqbMKFSCjnQr8QZ3O', 'Nature & Noise': '0JQ5DAqbMKFI3pNLtYMD9S', 'Funk & Disco': '0JQ5DAqbMKFFsW9N8maB6z', 'League of Legends': '0JQ5DAqbMKFLYQVFHcXMae', 'Spotify Singles': '0JQ5DAqbMKFDBgllo2cUIN', 'Summer': '0JQ5DAqbMKFLVaM30PMBm4', 'EQUAL': '0JQ5DAqbMKFPw634sFwguI', 'RADAR': '0JQ5DAqbMKFOOxftoKZxod', 'Fresh Finds': '0JQ5DAqbMKFImHYGo3eTSg', 'Tastemakers': '0JQ5DAqbMKFRKBHIxJ5hMm'}
+category_to_id = {'New Releases': '0JQ5DAqbMKFz6FAsUtgAab', 'Pop': '0JQ5DAqbMKFEC4WFtoNRpw',
+                  'Hip-Hop': '0JQ5DAqbMKFQ00XGBls6ym', 'Rock': '0JQ5DAqbMKFDXXwE9BDJAr',
+                  'Latin': '0JQ5DAqbMKFxXaXKP7zcDp', 'Charts': '0JQ5DAudkNjCgYMM0TZXDw',
+                  'Dance/Electronic': '0JQ5DAqbMKFHOzuVTgTizF', 'Mood': '0JQ5DAqbMKFzHmL4tf05da',
+                  'Indie': '0JQ5DAqbMKFCWjUTdzaG0e', 'Workout': '0JQ5DAqbMKFAXlCG6QvYQ4',
+                  'Discover': '0JQ5DAtOnAEpjOgUKwXyxj', 'Country': '0JQ5DAqbMKFKLfwjuJMoNC',
+                  'R&B': '0JQ5DAqbMKFEZPnFQSFB1T', 'K-pop': '0JQ5DAqbMKFGvOw3O4nLAf', 'Chill': '0JQ5DAqbMKFFzDl7qN9Apr',
+                  'Sleep': '0JQ5DAqbMKFCuoRTxhYWow', 'Party': '0JQ5DAqbMKFA6SOHvT3gck',
+                  'At Home': '0JQ5DAqbMKFx0uLQR2okcc', 'Decades': '0JQ5DAqbMKFIVNxQgRNSg0',
+                  'Love': '0JQ5DAqbMKFAUsdyVjCQuL', 'Metal': '0JQ5DAqbMKFDkd668ypn6O', 'Jazz': '0JQ5DAqbMKFAJ5xb0fwo9m',
+                  'Trending': '0JQ5DAqbMKFQIL0AXnG5AK', 'Wellness': '0JQ5DAqbMKFLb2EqgLtpjC',
+                  'Anime': '0JQ5DAqbMKFziKOShCi009', 'Gaming': '0JQ5DAqbMKFCfObibaOZbv',
+                  'Folk & Acoustic': '0JQ5DAqbMKFy78wprEpAjl', 'Focus': '0JQ5DAqbMKFCbimwdOYlsl',
+                  'Soul': '0JQ5DAqbMKFIpEuaCnimBj', 'Kids & Family': '0JQ5DAqbMKFFoimhOqWzLB',
+                  'Classical': '0JQ5DAqbMKFPrEiAOxgac3', 'TV & Movies': '0JQ5DAqbMKFOzQeOmemkuw',
+                  'Instrumental': '0JQ5DAqbMKFRieVZLLoo9m', 'Punk': '0JQ5DAqbMKFAjfauKLOZiv',
+                  'Ambient': '0JQ5DAqbMKFLjmiZRss79w', 'Netflix': '0JQ5DAqbMKFEOEBCABAxo9',
+                  'Blues': '0JQ5DAqbMKFQiK2EHwyjcU', 'Cooking & Dining': '0JQ5DAqbMKFRY5ok2pxXJ0',
+                  'Alternative': '0JQ5DAqbMKFFtlLYUHv8bT', 'Travel': '0JQ5DAqbMKFAQy4HL4XU2D',
+                  'Caribbean': '0JQ5DAqbMKFObNLOHydSW8', 'Afro': '0JQ5DAqbMKFNQ0fGp4byGU',
+                  'GLOW': '0JQ5DAqbMKFGnsSfvg90Wo', 'Songwriters': '0JQ5DAqbMKFSCjnQr8QZ3O',
+                  'Nature & Noise': '0JQ5DAqbMKFI3pNLtYMD9S', 'Funk & Disco': '0JQ5DAqbMKFFsW9N8maB6z',
+                  'League of Legends': '0JQ5DAqbMKFLYQVFHcXMae', 'Spotify Singles': '0JQ5DAqbMKFDBgllo2cUIN',
+                  'Summer': '0JQ5DAqbMKFLVaM30PMBm4', 'EQUAL': '0JQ5DAqbMKFPw634sFwguI',
+                  'RADAR': '0JQ5DAqbMKFOOxftoKZxod', 'Fresh Finds': '0JQ5DAqbMKFImHYGo3eTSg',
+                  'Tastemakers': '0JQ5DAqbMKFRKBHIxJ5hMm'}
+
 
 def parse_params_to_dict(input_str):
     """
@@ -34,6 +61,7 @@ def parse_params_to_dict(input_str):
         return {"Error": "Input string is not a dictionary"}
 
     return params_dict
+
 
 def extract_nearest_neighbours_input(params_dict):
     """
@@ -89,6 +117,7 @@ def validate_and_fix_dict(params_dict, add_artists=True):
         if isinstance(params_dict["seed_tracks"], list):
             params_dict["seed_tracks"] = ",".join(params_dict["seed_tracks"])
 
+
 def limit_dict_seeds_number(params_dict, add_artists=True):
     """
     Limits the number of seed artists and seed tracks in the input dictionary to 2 and 4, respectively, in place.
@@ -127,7 +156,6 @@ def limit_dict_seeds_number(params_dict, add_artists=True):
         else:
             if len(seed_tracks) > 4:
                 params_dict["seed_tracks"] = ",".join(seed_tracks[:4])
-
 
 
 def correct_audio_values_in_place(predict_audio_features):
@@ -173,3 +201,7 @@ def get_decades_start_and_end_years():
     }
 
     return decades_years
+
+
+def get_playlist_description(playlist_name):
+    return f"Your {playlist_name} playlist, Created by VibeCrafters! 🎶🎧🎵"
