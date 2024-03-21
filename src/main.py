@@ -44,7 +44,3 @@ async def create_playlist(playlist: Playlist):
     except Exception as e:
         logger.exception(f"Error creating playlist: {e}")
         raise HTTPException(status_code=500, detail="Error in creating playlist. Please try again.")
-
-result = get_playlist(Playlist(event="sad 10s", music_genre="pop"))
-#result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))
-#result = get_playlist(Playlist(event="EuroTrip", music_genre="alternative", mood="dreamy"))

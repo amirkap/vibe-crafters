@@ -330,7 +330,7 @@ def find_seed_tracks_by_playlist_id(playlist_id, spotify, num_attempts):
     Returns:
         A string containing the seed tracks or None if an error occurred.
     """
-    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    playlist_tracks = spotify.query_api("get_playlist_songs", {"playlist_id": playlist_id})
     if not playlist_tracks:
         return None
 
@@ -354,7 +354,7 @@ def find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts):
     Returns:
         A string containing the seed artists or None if an error occurred.
     """
-    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    playlist_tracks = spotify.query_api("get_playlist_songs", {"playlist_id": playlist_id})
     if not playlist_tracks:
         return None
 
@@ -382,7 +382,7 @@ def get_most_popular_artists(playlist_id, spotify, num_attempts):
     Returns:
         A string containing the seed artists or None if an error occurred.
     """
-    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    playlist_tracks = spotify.query_api("get_playlist_songs", {"playlist_id": playlist_id})
     if not playlist_tracks:
         return None
 
@@ -394,7 +394,6 @@ def get_most_popular_artists(playlist_id, spotify, num_attempts):
     sorted_ids_and_popularity = sorted(ids_and_popularity, key=lambda x: x[1], reverse=True)
     print(sorted_ids_and_popularity)
     seed_artists = [x[0] for x in sorted_ids_and_popularity][:6]
-    #seed_artists = sorted(artists_ids, key=lambda x: spotify.get_artist(x)["popularity"], reverse=True)
     seed_artists_str = ",".join(seed_artists)
     return seed_artists_str
 
@@ -409,7 +408,7 @@ def get_most_popular_tracks(playlist_id, spotify, num_attempts):
     Returns:
         A string containing the seed tracks or None if an error occurred.
     """
-    playlist_tracks = spotify.get_playlist_songs(playlist_id)
+    playlist_tracks = spotify.query_api("get_playlist_songs", {"playlist_id": playlist_id})
     if not playlist_tracks:
         return None
 
@@ -420,7 +419,7 @@ def get_most_popular_tracks(playlist_id, spotify, num_attempts):
     popularity_list = []
     for i in range(0, len(tracks_ids), 99):
         track_group = tracks_ids[i:i+99]
-        tracks = spotify.get_multiple_tracks(track_group)
+        tracks = spotify.query_api("get_multiple_tracks", {"track_ids": track_group})
         for track in tracks['tracks']:
             popularity_list.append((track["id"], track["popularity"]))
 
@@ -429,8 +428,3 @@ def get_most_popular_tracks(playlist_id, spotify, num_attempts):
     seed_tracks = [x[0] for x in sorted_ids_and_popularity][:6]
     seed_tracks_str = ",".join(seed_tracks)
     return seed_tracks_str
-
-spotify = SpotifyAPIClass()
-# print(find_seed_artists_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
-# print(find_seed_tracks_by_playlist_id("6TeyryiZ2UEf3CbLXyztFA", spotify))
-#print(get_most_popular_artists("6TeyryiZ2UEf3CbLXyztFA", spotify))

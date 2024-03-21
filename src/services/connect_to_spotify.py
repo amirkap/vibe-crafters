@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv, set_key, dotenv_values
 import requests
-
+from src.logger import *
 
 class SpotifyAPIClass:
     """
@@ -125,25 +125,23 @@ class SpotifyAPIClass:
         Returns:
             The response from the API.
         """
-        try:
-            method = getattr(self, func_name)
-            response = method(**kwargs)
-            if func_name == "get_recommendations" and "error" not in response:
-                only_tracks = [track["uri"] for track in response]
-                print(f"Response of '{func_name}()': {only_tracks}")
-            else:
-                print(f"Response of '{func_name}()': {response}")
-            if "error" in response:
-                if response["error"]["status"] == 401 and iteration_no < 2:
-                    if response["error"]["message"] in ["The access token expired", "Invalid access token"]:
-                        self.refresh_token_and_update_env()
-                        return self.query_api(func_name, kwargs, iteration_no + 1)
-                return {"error": response["error"]["status"], "message": response["error"]["message"]}
-            return response
-        except Exception as e:
-            # add to logger
-            print(e)
-            return {"error": 500, "message": "Internal server error"}
+        method = getattr(self, func_name)
+        response = method(**kwargs)
+        if func_name == "get_recommendations" and "error" not in response:
+            only_tracks = [track["uri"] for track in response]
+            print(f"Response of '{func_name}()': {only_tracks}")
+        else:
+            print(f"Response of '{func_name}()': {response}")
+        if "error" in response:
+            if response["error"]["status"] == 401 and iteration_no < 2:
+                if response["error"]["message"] in ["The access token expired", "Invalid access token"]:
+                    self.refresh_token_and_update_env()
+                    return self.query_api(func_name, kwargs, iteration_no + 1)
+            logger.exception(f"Error in {func_name}(): {response['error']['message']}")
+            raise Exception(response["error"]["message"])
+        return response
+
+
 
     def create_playlist(self, name, description=''):
         """
