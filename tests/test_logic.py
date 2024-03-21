@@ -21,7 +21,7 @@ from src.logic.logic import (
 
 class TestLogic(unittest.TestCase):
 
-
+# test
 
     # @patch('src.logic.logic.OpenAIClass.get_chat_response_from_openai')
     # @patch('src.logic.logic.SpotifyAPIClass.create_playlist_with_tracks')
