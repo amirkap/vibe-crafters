@@ -1,0 +1,53 @@
+trigger:
+  branches:
+    include:
+    - main  # Trigger the pipeline on commits to the main branch
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use an Ubuntu VM for the pipeline
+
+stages:
+  - stage: Test
+    displayName: 'Run Tests'
+    jobs:
+      - job: RunTests
+        displayName: 'Run Python Tests'
+        steps:
+          - checkout: self  # Check out the repository code
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'  # Use Python 3.x
+              addToPath: true
+          - script: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt  # Install dependencies
+              python -m unittest discover -s tests  # Run tests in the 'tests' directory
+            displayName: 'Install dependencies and run tests'
+
+  - stage: BuildAndDeploy
+    displayName: 'Build and Deploy'
+    condition: succeeded('Test')  # Proceed with this stage only if the tests pass
+    jobs:
+      - job: BuildAndPush
+        displayName: 'Build and Push Docker Image'
+        steps:
+          - checkout: self  # Check out the repository code
+          - script: |
+              docker build -t amirkap/vibe-crafters-api:latest .  # Build Docker image
+              docker login -u amirkap -p $(DOCKER_HUB_PASSWORD)  # Log in to Docker Hub
+              docker push amirkap/vibe-crafters-api:latest  # Push image to Docker Hub
+            displayName: 'Build and push Docker image'
+            env:
+              DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)  # Use the secret variable for Docker Hub password
+      - job: Redeploy
+        displayName: 'Redeploy Azure Container Instance'
+        steps:
+          - checkout: none  # No need to check out the repository code for deployment
+          - script: |
+              az login --service-principal -u $(AZURE_SP_APP_ID) -p $(AZURE_SP_PASSWORD) --tenant $(AZURE_TENANT_ID)
+              az container restart --name vibe-crafters --resource-group swusingai
+            displayName: 'Restart Azure Container Instance'
+            env:
+              AZURE_SP_APP_ID: $(AZURE_SP_APP_ID)
+              AZURE_SP_PASSWORD: $(AZURE_SP_PASSWORD)
+              AZURE_TENANT_ID: $(AZURE_TENANT_ID)
