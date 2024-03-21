@@ -44,12 +44,15 @@ document.getElementById("playlistForm").addEventListener("submit", function(e) {
             resultDiv.appendChild(link);
             })
     .catch(error => {
-        if (error.detail && Array.isArray(error.detail)) {
-            // Extract 'msg' from the first error detail (customize as needed)
-            const errorMessage = error.detail.map(err => err.msg).join(", ");
-            resultDiv.innerHTML = errorMessage;
+        // Handle structured error messages
+        if (error.detail) {
+            // If detail is an array, join messages. Otherwise, display it directly
+            const message = Array.isArray(error.detail)
+                ? error.detail.map(e => e.msg || e.message).join(", ")
+                : error.detail;
+            resultDiv.innerHTML = message;
         } else {
-            // Generic error message for other types of errors
+            // Fallback for unstructured error messages
             resultDiv.innerHTML = "An error occurred. Please try again.";
         }
     });
