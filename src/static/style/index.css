@@ -1,0 +1,75 @@
+body {
+    font-family: "HelveticaNeue-Light", sans-serif;
+    background-color: #F5E1D9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h2 {
+    color: #236b88;
+    margin-bottom: 20px;
+}
+
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+}
+
+label {
+    color: #236b88;
+    font-weight: bold;
+}
+
+input[type="text"], select {
+    font-family: "HelveticaNeue-Light", sans-serif;
+    padding: 10px;
+    margin-top: 5px;
+    border: 2px solid #3784a2;
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="text"]:focus, select:focus {
+    border-color: #749dc2;
+}
+
+input[type="submit"] {
+    background-color: #3784a2;
+    color: white;
+    margin-top: 20px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #749dc2;
+}
+
+#result {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px; /* Adjust based on your preference */
+    width: 300px; /* Adjust based on the width of your form or as needed */
+    margin-top: 20px;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.9em;
+    color: #236b88;
+    text-align: center; /* Centers text horizontally */
+}
