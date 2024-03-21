@@ -20,8 +20,8 @@ stages:
               addToPath: true
           - script: |
               python -m pip install --upgrade pip
-              pip install -r requirements.txt  # Install dependencies
-              python -m unittest discover -s tests  # Run tests in the 'tests' directory
+              pip install -r requirements.txt  # Install dependencies, including pytest
+              pytest tests/  # Run tests in the 'tests' directory
             displayName: 'Install dependencies and run tests'
 
   - stage: BuildAndDeploy
