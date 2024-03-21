@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 from pathlib import Path
+from src.api_calls_db.log_api_calls_db import log_api_call
 from src.models.Playlist import Playlist
 from src.logic.logic import get_playlist
 from src.logger import *
@@ -28,6 +29,19 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all methods
     allow_headers=["*"],  # Allow all headers
 )
+
+# Middleware for logging API calls
+@app.middleware("http")
+async def db_log_middleware(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    success = response.status_code < 400  # Success if status code is less than 400
+    ip_address = request.client.host
+    try:
+        log_api_call(path, success, ip_address)  # Log the API call
+    except Exception as e:
+        logger.exception(f"Error logging API call: {e}")
+    return response
 
 @app.get("/")
 async def serve_spa():
