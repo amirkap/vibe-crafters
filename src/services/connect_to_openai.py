@@ -118,5 +118,5 @@ def get_assesment_user_prompt(tracks_list):
     return user_prompt
 
 
-openai = OpenAIClass()
+
 
