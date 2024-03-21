@@ -358,6 +358,23 @@ class SpotifyAPIClass:
         response = requests.get(url, headers=headers)
         return response.json()
 
+    def get_multiple_tracks(self, track_ids):
+        """
+        Gets the information for the specified tracks.
+        Args:
+            track_ids: A list of track IDs to get the information for.
+
+        Returns:
+            A dictionary containing the response from the API.
+        """
+        track_ids_str = ",".join(track_ids)
+        url = f"https://api.spotify.com/v1/tracks?ids={track_ids_str}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        response = requests.get(url, headers=headers)
+        return response.json()
+
     def get_multiple_tracks_info(self, track_ids):
         """
         Gets the information for the specified tracks.
