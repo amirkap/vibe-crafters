@@ -1,7 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
-
+from pathlib import Path
 from src.models.Playlist import Playlist
 from src.logic.logic import get_playlist
 import logging
@@ -16,6 +18,11 @@ logger = logging.getLogger(__name__)
 
 # run the FastAPI app
 app = FastAPI()
+current_file_path = Path(__file__).resolve()
+project_root = current_file_path.parent
+static_files_path = project_root / "static"
+app.mount("/static", StaticFiles(directory=static_files_path), name="static")
+
 
 origins = [
     "*"
@@ -30,10 +37,11 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# Serve files from the "frontend" directory under the "/frontend" route
-#app.mount("/src/UI", StaticFiles(directory="/src/UI", html=True), name="frontend")
+@app.get("/")
+async def serve_spa():
+    return FileResponse("src/static/index.html")
 
-@app.post("/create_playlist")
+@app.post("/api/create_playlist")
 async def create_playlist(playlist: Playlist):
     try:
         result = get_playlist(playlist)
@@ -42,9 +50,9 @@ async def create_playlist(playlist: Playlist):
         print(f"Error in input parameters: {e}")
         raise HTTPException(status_code=400, detail=f"Error in input parameters: {e}")
     except Exception as e:
-        logger.error(f"Error creating playlist: {e}")
+        logger.exception(f"Error creating playlist: {e}")
         raise HTTPException(status_code=500, detail="Error in creating playlist. Please try again.")
 
-#result = get_playlist(Playlist(event="sad 10s", music_genre="pop", mood="sad", decade="2000s"))
-result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))
+#result = get_playlist(Playlist(event="sad 10s", music_genre="pop"))
+#result = get_playlist(Playlist(event="Gym Playlist", music_genre="pop", mood="energetic"))
 #result = get_playlist(Playlist(event="EuroTrip", music_genre="alternative", mood="dreamy"))
