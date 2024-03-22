@@ -10,8 +10,8 @@ stages:
   - stage: Test
     displayName: 'Run Tests'
     jobs:
-      - job: RunTests
-        displayName: 'Run Python Tests'
+      - job: InstallDependencies
+        displayName: 'Install Dependencies'
         steps:
           - checkout: self  # Check out the repository code
           - task: UsePythonVersion@0
@@ -21,9 +21,17 @@ stages:
           - script: |
               python -m pip install --upgrade pip
               pip install -r requirements.txt  # Install dependencies, including pytest
+            displayName: 'Install dependencies'
+
+      - job: RunTests
+        displayName: 'Run Python Tests'
+        dependsOn: InstallDependencies  # Ensure dependencies are installed before running tests
+        steps:
+          - checkout: self  # Check out the repository code
+          - script: |
               export PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)  # Add the project root directory to the Python path
               pytest tests/  # Run tests in the 'tests' directory
-            displayName: 'Install dependencies and run tests'
+            displayName: 'Run tests'
 
   - stage: BuildAndPush
     displayName: 'Build and Push Docker Image'

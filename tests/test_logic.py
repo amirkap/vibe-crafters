@@ -312,17 +312,16 @@ class TestLogic(unittest.TestCase):
 
     # test find_seed_artists_by_playlist_id
     @patch('src.services.connect_to_spotify.SpotifyAPIClass')
-    @patch('src.services.connect_to_spotify.SpotifyAPIClass.query_api')
-    def test_find_seed_artists_successful(self, mock_query_api):
+    def test_find_seed_artists_successful(self, mock_spotify_class):
+        mock_instance = mock_spotify_class.return_value
         # Mock the response from SpotifyAPIClass.query_api for getting playlist songs
-        mock_query_api.return_value = {
+        mock_instance.query_api.return_value = {
             'items': [{'track': {'artists': [{'id': 'artist1'}]}}, {'track': {'artists': [{'id': 'artist2'}]}}]
         }
-        spotify = SpotifyAPIClass()
         playlist_id = 'test_playlist_id'
         num_attempts = 1
 
-        result = find_seed_artists_by_playlist_id(playlist_id, spotify, num_attempts)
+        result = find_seed_artists_by_playlist_id(playlist_id, mock_instance, num_attempts)
 
         # Since the function randomly selects, we check if the result is one of the possible combinations
         self.assertIn(result, ['artist1,artist2', 'artist2,artist1'])
@@ -349,10 +348,10 @@ class TestLogic(unittest.TestCase):
 
     @patch('src.services.connect_to_spotify.SpotifyAPIClass')
     @patch('src.services.connect_to_spotify.SpotifyAPIClass.query_api')
-    def test_find_seed_artists_no_artists(self, mock_query_api):
+    def test_find_seed_artists_no_artists(self, mock_spotify_class, mock_query_api):
         # Simulate an empty playlist response
+        spotify = mock_spotify_class.return_value
         mock_query_api.return_value = {'items': []}
-        spotify = SpotifyAPIClass()
         playlist_id = 'empty_playlist_id'
         num_attempts = 1
 
