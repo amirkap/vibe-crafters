@@ -149,3 +149,5 @@ class MusicGenre(str, Enum):
             raise ValueError(f"Invalid value for MusicGenre: {value}")
         except ValueError:
             raise ValueError(f"Value {value} is not a valid MusicGenre")
+        except AttributeError:
+            raise ValueError(f"Value {value} is not a valid MusicGenre")
