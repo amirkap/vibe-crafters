@@ -11,17 +11,17 @@ audio_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acoustic
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the path to the streamlit.csv file
-DATASET_NAME = os.path.join(current_dir, "streamlit.csv")
+DATASET_NAME = os.path.join(current_dir, "streamlit.csv.gz")
 
 def init_data_frame():
     """
-    Reads the CSV file and returns a pandas DataFrame.
+    Reads the compressed CSV file and returns a pandas DataFrame.
 
     Returns:
-        A pandas DataFrame containing the data from the CSV file.
+        A pandas DataFrame containing the data from the compressed CSV file.
     """
-    # Read the CSV file
-    data_frame = pd.read_csv(DATASET_NAME)
+    # Read the compressed CSV file
+    data_frame = pd.read_csv(DATASET_NAME, compression='gzip')
     return data_frame
 
 def find_nearest_neighbors(data_frame, instance, n_neighbors=5):
