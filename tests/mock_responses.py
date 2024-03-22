@@ -117,7 +117,6 @@ mock_get_recommendations_response = json.loads('''[
     "is_local": false
   }
 ]''')
-mock_query_api_get_artist_response = {}
 mock_search_item_response = {
     "playlists": {
         "href": "https://api.spotify.com/v1/search?query=80s+happy+disco&type=playlist&market=US&offset=0&limit=10",

@@ -1,5 +1,5 @@
 import json
-from src.utils.Utils import *
+from src.utils.utils import *
 from src.services.connect_to_openai import *
 from src.models.Playlist import Playlist
 from src.services.connect_to_spotify import SpotifyAPIClass
