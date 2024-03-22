@@ -7,10 +7,12 @@ from pathlib import Path
 from src.api_calls_db.log_api_calls_db import log_api_call
 from src.models.Playlist import Playlist
 from src.logic.logic import get_playlist
-from src.logger import *
+from src.exception_logs_db.logger import *
 
 # run the FastAPI app
 app = FastAPI()
+
+# Add the static files (frontend files) to the application
 current_file_path = Path(__file__).resolve()
 project_root = current_file_path.parent
 static_files_path = project_root / "static"
@@ -50,6 +52,7 @@ async def serve_spa():
 @app.post("/api/create_playlist")
 async def create_playlist(playlist: Playlist):
     try:
+        raise Exception("This is a test exception no 2")
         result = get_playlist(playlist)
         return {"playlist_url": result}
     except ValidationError as e:

@@ -31,4 +31,24 @@ def log_exception_to_db(level, message):
     except Error as e:
         print(f"Error logging exception to database: {e}")
 
-log_exception_to_db('ERROR', 'This is an error message')
+def get_exception_logs():
+    load_dotenv()
+    host = os.getenv('MYSQL_HOST')
+    user = os.getenv('MYSQL_USERNAME')
+    passwd = os.getenv('MYSQL_PASSWORD')
+    database = os.getenv('MYSQL_DATABASE')
+    try:
+        connection = mysql.connector.connect(
+            host=host,
+            database=database,
+            user=user,
+            password=passwd
+        )
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM ExceptionLogs")
+        logs = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return logs
+    except Error as e:
+        print(f"Error getting exception logs from database: {e}")

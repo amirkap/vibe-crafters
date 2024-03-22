@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv, set_key, dotenv_values
 import requests
-from src.logger import *
+from src.exception_logs_db.logger import *
 
 class SpotifyAPIClass:
     """
