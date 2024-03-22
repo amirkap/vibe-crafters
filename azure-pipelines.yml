@@ -25,12 +25,12 @@ stages:
               pytest tests/  # Run tests in the 'tests' directory
             displayName: 'Install dependencies and run tests'
 
-  - stage: BuildAndDeploy
-    displayName: 'Build and Deploy'
+  - stage: BuildAndPush
+    displayName: 'Build and Push Docker Image'
     condition: succeeded('Test')  # Proceed with this stage only if the tests pass
     jobs:
       - job: BuildAndPush
-        displayName: 'Build and Push Docker Image'
+        displayName: 'Build and Push'
         steps:
           - checkout: self  # Check out the repository code
           - script: |
@@ -40,9 +40,13 @@ stages:
             displayName: 'Build and push Docker image'
             env:
               DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)  # Use the secret variable for Docker Hub password
+
+  - stage: Redeploy
+    displayName: 'Redeploy Azure Container Instance'
+    condition: succeeded('BuildAndPush')  # Proceed with this stage only if the BuildAndPush stage passes
+    jobs:
       - job: Redeploy
-        displayName: 'Redeploy Azure Container Instance'
-        dependsOn: BuildAndPush  # Ensure this job starts only after BuildAndPush has completed
+        displayName: 'Redeploy'
         steps:
           - checkout: none  # No need to check out the repository code for deployment
           - script: |
