@@ -23,7 +23,7 @@ origins = [
     "*"
 ]
 
-# Add CORSMiddleware to the application
+# Add CORSMiddleware to the application.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # List of origins that are allowed to make requests
