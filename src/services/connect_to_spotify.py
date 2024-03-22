@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv, set_key, dotenv_values
 import requests
 from src.exception_logs_db.logger import *
+from src.utils.mysql_utils import *
 
 class SpotifyAPIClass:
     """
@@ -12,19 +13,18 @@ class SpotifyAPIClass:
     """
     def __init__(self):
         load_dotenv()
-        self.client_id = os.getenv("SPOTIFY_CLIENT_ID")
-        self.client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
-        self.user_id = os.getenv("SPOTIFY_USER_ID")
-        self.access_token = os.getenv("ACCESS_TOKEN")
-        self.refresh_token = os.getenv("SPOTIFY_REFRESH_TOKEN")
+        self.client_id = get_config_value("SPOTIFY_CLIENT_ID")
+        self.client_secret = get_config_value("SPOTIFY_CLIENT_SECRET")
+        self.user_id = get_config_value("SPOTIFY_USER_ID")
+        self.access_token = get_config_value("ACCESS_TOKEN")
+        self.refresh_token = get_config_value("SPOTIFY_REFRESH_TOKEN")
+        self.token_expiry = get_config_value("TOKEN_EXPIRY")
 
-        # get access token
-        env_values = dotenv_values("../.env")
         current_time = datetime.now()
 
         # Check if token expiry exists and has passed
-        if "TOKEN_EXPIRY" in env_values:
-            token_expiry = datetime.strptime(env_values["TOKEN_EXPIRY"], "%Y-%m-%d %H:%M:%S")
+        if self.token_expiry:
+            token_expiry = datetime.strptime(self.token_expiry, "%Y-%m-%d %H:%M:%S")
             if current_time >= token_expiry:
                 # Token has expired, request a new one
                 self.refresh_token_and_update_env()
@@ -61,22 +61,16 @@ class SpotifyAPIClass:
             expires_in: The time in seconds until the token expires.
             refresh_token: The new refresh token.
 
-        Returns:
-
         """
         expiry_time = datetime.now() + timedelta(seconds=expires_in)
-        env_path = '.env'
-        set_key(env_path, "ACCESS_TOKEN", access_token)
-        set_key(env_path, "TOKEN_EXPIRY", expiry_time.strftime("%Y-%m-%d %H:%M:%S"))
+        update_config_value("ACCESS_TOKEN", access_token)
+        update_config_value("TOKEN_EXPIRY", expiry_time.strftime("%Y-%m-%d %H:%M:%S"))
         if refresh_token:
-            set_key(env_path, "SPOTIFY_REFRESH_TOKEN", refresh_token)
+            update_config_value("SPOTIFY_REFRESH_TOKEN", refresh_token)
 
     def get_access_token_and_update_env(self):
         new_token_data = self.get_access_token()
         self.update_env_with_new_token(new_token_data["access_token"], new_token_data["expires_in"])
-        os.environ["ACCESS_TOKEN"] = new_token_data["access_token"]
-        load_dotenv()
-        self.access_token = os.getenv("ACCESS_TOKEN")
 
     def refresh_access_token(self):
         """
@@ -105,9 +99,7 @@ class SpotifyAPIClass:
         """
         new_token_data = self.refresh_access_token()
         self.update_env_with_new_token(new_token_data["access_token"], new_token_data["expires_in"])
-        os.environ["ACCESS_TOKEN"] = new_token_data["access_token"]
-        load_dotenv()
-        self.access_token = os.getenv("ACCESS_TOKEN")
+        self.access_token = get_config_value("ACCESS_TOKEN")
 
     def query_api(self, func_name, kwargs, iteration_no=0):
         """

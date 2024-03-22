@@ -52,7 +52,6 @@ async def serve_spa():
 @app.post("/api/create_playlist")
 async def create_playlist(playlist: Playlist):
     try:
-        raise Exception("This is a test exception no 2")
         result = get_playlist(playlist)
         return {"playlist_url": result}
     except ValidationError as e:
