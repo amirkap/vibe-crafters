@@ -311,6 +311,7 @@ class TestLogic(unittest.TestCase):
         self.assertIsNone(result)
 
     # test find_seed_artists_by_playlist_id
+    @patch('src.services.connect_to_spotify.SpotifyAPIClass')
     @patch('src.services.connect_to_spotify.SpotifyAPIClass.query_api')
     def test_find_seed_artists_successful(self, mock_query_api):
         # Mock the response from SpotifyAPIClass.query_api for getting playlist songs
@@ -346,6 +347,7 @@ class TestLogic(unittest.TestCase):
         # Validate the response to ensure it handles insufficient data gracefully
         self.assertIsNone(result)
 
+    @patch('src.services.connect_to_spotify.SpotifyAPIClass')
     @patch('src.services.connect_to_spotify.SpotifyAPIClass.query_api')
     def test_find_seed_artists_no_artists(self, mock_query_api):
         # Simulate an empty playlist response
