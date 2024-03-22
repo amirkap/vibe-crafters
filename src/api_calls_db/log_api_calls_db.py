@@ -1,38 +1,54 @@
-import sqlite3
+import os
+import mysql.connector
+from mysql.connector import Error
+from dotenv import load_dotenv, set_key, dotenv_values
 from contextlib import contextmanager
 from datetime import datetime
 import pytz
 
-DATABASE_FILENAME = 'api_calls.db'
-
-def create_connection():
-    """Create a database connection."""
-    conn = sqlite3.connect(DATABASE_FILENAME)
-    return conn
-
-@contextmanager
-def get_cursor():
-    """Provide a transactional scope around a series of operations."""
-    conn = create_connection()
-    cursor = conn.cursor()
-    yield cursor
-    conn.commit()
-    conn.close()
-
-def create_table():
-    """Create the API call logs table if it doesn't already exist."""
-    with get_cursor() as cursor:
-        cursor.execute("""CREATE TABLE IF NOT EXISTS api_call_logs (id INTEGER PRIMARY KEY,
-                path TEXT NOT NULL,
-                success BOOLEAN NOT NULL,
-                ip_address TEXT NOT NULL,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
+def create_db_connection():
+    """Create a connection to the SQLite database."""
+    load_dotenv()
+    host = os.getenv('MYSQL_HOST')
+    user = os.getenv('MYSQL_USERNAME')
+    passwd = os.getenv('MYSQL_PASSWORD')
+    database = os.getenv('MYSQL_DATABASE')
+    try:
+        connection = mysql.connector.connect(
+            host=host,
+            user=user,
+            passwd=passwd,
+            database=database,
+        )
+        return connection
+    except Error as e:
+        print(f"The error '{e}' occurred")
 
 def log_api_call(path, success, ip_address):
     """Log an API call with the timestamp adjusted to Israel time."""
+    connection = create_db_connection()
+    cursor = connection.cursor()
     israel_tz = pytz.timezone('Israel')
     now = datetime.now(israel_tz).strftime('%Y-%m-%d %H:%M:%S')
-    with get_cursor() as cursor:
-        cursor.execute("""INSERT INTO api_call_logs (path, success, ip_address, timestamp)
-                          VALUES (?, ?, ?, ?)""",
-                       (path, success, ip_address, now))
+
+    query = """
+    INSERT INTO api_call_logs (path, success, ip_address, timestamp)
+    VALUES (%s, %s, %s, %s)
+    """
+    cursor.execute(query, (path, success, ip_address, now))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_api_call_logs():
+    """Get all the API call logs."""
+    connection = create_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM api_call_logs")
+    logs = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return logs
+
+#log_api_call('/api/v1/playlist', True, '1.1.1.1')
+print(get_api_call_logs())
