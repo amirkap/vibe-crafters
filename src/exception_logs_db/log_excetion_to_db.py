@@ -18,9 +18,9 @@ def log_exception_to_db(level, message):
     try:
         connection = mysql.connector.connect(
             host=host,
-            database=user,
-            user=passwd,
-            password=database
+            database=database,
+            user=user,
+            password=passwd
         )
         cursor = connection.cursor()
         query = "INSERT INTO ExceptionLogs (level, message, timestamp) VALUES (%s, %s, %s)"
@@ -30,3 +30,5 @@ def log_exception_to_db(level, message):
         connection.close()
     except Error as e:
         print(f"Error logging exception to database: {e}")
+
+log_exception_to_db('ERROR', 'This is an error message')
