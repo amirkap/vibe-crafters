@@ -10,27 +10,24 @@ stages:
   - stage: Test
     displayName: 'Run Tests'
     jobs:
-      - job: InstallDependencies
-        displayName: 'Install Dependencies'
+      - job: TestApplication
+        displayName: 'Test Application'
         steps:
-          - checkout: self  # Check out the repository code
+          - checkout: self
+
           - task: UsePythonVersion@0
             inputs:
-              versionSpec: '3.x'  # Use Python 3.x
+              versionSpec: '3.x'
               addToPath: true
+
           - script: |
               python -m pip install --upgrade pip
-              pip install -r requirements.txt  # Install dependencies, including pytest
+              pip install -r requirements.txt
             displayName: 'Install dependencies'
 
-      - job: RunTests
-        displayName: 'Run Python Tests'
-        dependsOn: InstallDependencies  # Ensure dependencies are installed before running tests
-        steps:
-          - checkout: self  # Check out the repository code
           - script: |
-              export PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)  # Add the project root directory to the Python path
-              pytest tests/  # Run tests in the 'tests' directory
+              export PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)
+              pytest tests/
             displayName: 'Run tests'
 
   - stage: BuildAndPush
