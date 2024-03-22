@@ -7,6 +7,15 @@ from dotenv import load_dotenv
 import os
 
 def log_exception_to_db(level, message):
+    """
+    Log an exception to the database.
+    Args:
+        level: The level of the exception (e.g. ERROR, WARNING, INFO)
+        message: The message of the exception
+
+    Exceptions:
+        Error: An error occurred logging the exception to the database
+    """
     israel_tz = pytz.timezone('Israel')
     now = datetime.now(israel_tz).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -32,6 +41,13 @@ def log_exception_to_db(level, message):
         print(f"Error logging exception to database: {e}")
 
 def get_exception_logs():
+    """
+    Get all the exception logs from the database.
+    Returns:
+        A list of all the exception logs
+    Exceptions:
+        Error: An error occurred getting the exception logs from the database
+    """
     load_dotenv()
     host = os.getenv('MYSQL_HOST')
     user = os.getenv('MYSQL_USERNAME')
