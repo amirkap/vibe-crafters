@@ -42,6 +42,7 @@ stages:
               DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)  # Use the secret variable for Docker Hub password
       - job: Redeploy
         displayName: 'Redeploy Azure Container Instance'
+        dependsOn: BuildAndPush  # Ensure this job starts only after BuildAndPush has completed
         steps:
           - checkout: none  # No need to check out the repository code for deployment
           - script: |
