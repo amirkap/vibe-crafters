@@ -66,3 +66,44 @@ def get_table_data(table, connection):
     records = cursor.fetchall()
     cursor.close()
     return records
+
+
+def get_config_value(key_name):
+    """
+    Get a configuration value from the database.
+    Args:
+        key_name: The key name of the configuration value
+
+    Returns:
+        The value of the configuration
+    """
+    # Connect to the database
+    connection = create_db_connection()
+    try:
+        cursor = connection.cursor()
+        # Fetch the configuration value
+        sql = "SELECT value_name FROM ConfigVariables WHERE key_name = %s"
+        cursor.execute(sql, (key_name,))
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        else:
+            return None
+    finally:
+        connection.close()
+
+def update_config_value(key_name, value_name):
+    """
+    Update a configuration value in the database.
+    Args:
+        key_name: The key name of the configuration value
+        value_name: The new value of the configuration
+    """
+    connection = create_db_connection()
+    try:
+        cursor = connection.cursor()
+        sql = "UPDATE ConfigVariables SET value_name = %s WHERE key_name = %s"
+        cursor.execute(sql, (value_name, key_name))
+        connection.commit()
+    finally:
+        connection.close()
